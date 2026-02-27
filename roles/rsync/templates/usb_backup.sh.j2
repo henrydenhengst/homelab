@@ -1,0 +1,18 @@
+#!/bin/bash
+# Check of de schijf echt aanwezig is voor we gaan schrijven
+if mountpoint -q {{ usb_mount_path }}; then
+    echo "USB schijf gevonden. Start synchronisatie..."
+    
+    # Backup van je containers en data
+    rsync -av --delete /opt/ {{ usb_mount_path }}/opt_backup/
+    
+    # Backup van je systeemconfiguratie
+    rsync -av --delete /etc/ {{ usb_mount_path }}/etc_backup/
+    
+    # Log de tijd van de laatste backup op de schijf zelf
+    date > {{ usb_mount_path }}/last_backup.txt
+    echo "Backup succesvol afgerond."
+else
+    echo "FOUT: USB schijf niet gemount op {{ usb_mount_path }}. Backup afgebroken."
+    exit 1
+fi

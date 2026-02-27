@@ -1,25 +1,35 @@
 ---
+- name: Zorg dat het mountpoint bestaat
+  file:
+    path: "{{ usb_mount_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Koppel de USB schijf via fstab (UUID-gebaseerd)
+  mount:
+    path: "{{ usb_mount_path }}"
+    src: "UUID={{ usb_backup_uuid }}"
+    fstype: ext4
+    opts: defaults,nofail
+    state: mounted
+
 - name: Installeer Rsync
   apt:
     name: rsync
     state: present
 
-- name: Maak directory voor lokale Rsync snapshots
-  file:
-    path: /opt/backups/rsync
-    state: directory
-    mode: '0700'
-    owner: henry
-
-- name: Plaats het lokale backup script
+- name: Maak het USB backup script aan
   template:
-    src: local_backup.sh.j2
-    dest: /usr/local/bin/local_backup.sh
+    src: usb_backup.sh.j2
+    dest: /usr/local/bin/usb_backup.sh
     mode: '0755'
+    owner: "{{ main_user }}"
 
-- name: Cronjob voor lokale backup (elke nacht om 03:00)
+- name: Cronjob voor USB backup (03:00 uur)
   cron:
-    name: "Lokaal Rsync snapshot"
+    name: "Dagelijkse USB backup naar {{ usb_mount_path }}"
     hour: "03"
     minute: "00"
-    job: "/usr/local/bin/local_backup.sh > /dev/null 2>&1"
+    job: "/usr/local/bin/usb_backup.sh > /dev/null 2>&1"

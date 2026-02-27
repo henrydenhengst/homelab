@@ -1,0 +1,20 @@
+---
+- name: Maak directory voor DuckDNS log
+  file:
+    path: /var/log/duckdns
+    state: directory
+    owner: "{{ main_user }}"
+    mode: '0755'
+
+- name: Maak het DuckDNS update script
+  template:
+    src: duck.sh.j2
+    dest: /usr/local/bin/duck.sh
+    mode: '0700'
+    owner: "{{ main_user }}"
+
+- name: Cronjob voor DuckDNS update (elke 5 minuten)
+  cron:
+    name: "DuckDNS IP update"
+    minute: "*/5"
+    job: "/usr/local/bin/duck.sh > /dev/null 2>&1"

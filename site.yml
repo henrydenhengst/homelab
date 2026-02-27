@@ -10,3 +10,4 @@
     - rsync
     - rclone
     - flame
+    - duckdns
