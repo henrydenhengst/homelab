@@ -1,0 +1,25 @@
+---
+- name: Maak directory voor Caddy data
+  file:
+    path: /opt/caddy
+    state: directory
+    owner: "{{ main_user }}"
+    mode: '0755'
+
+- name: Plaats de Caddyfile
+  template:
+    src: Caddyfile.j2
+    dest: /opt/caddy/Caddyfile
+    owner: "{{ main_user }}"
+
+- name: Start Caddy container
+  docker_container:
+    name: caddy
+    image: caddy:latest
+    state: started
+    restart_policy: unless-stopped
+    network_mode: host
+    volumes:
+      - /opt/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config

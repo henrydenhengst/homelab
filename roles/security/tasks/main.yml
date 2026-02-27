@@ -22,6 +22,18 @@
     port: '5005'
     proto: tcp
 
+- name: Sta HTTP toe (voor SSL verificatie)
+  ufw:
+    rule: allow
+    port: '80'
+    proto: tcp
+
+- name: Sta HTTPS toe (voor je apps)
+  ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+
 - name: Zet de firewall aan
   ufw:
     state: enabled

@@ -11,3 +11,4 @@
     - rclone
     - flame
     - duckdns
+    - caddy
