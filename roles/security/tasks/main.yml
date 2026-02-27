@@ -1,0 +1,22 @@
+---
+- name: Installeer UFW
+  apt:
+    name: ufw
+    state: present
+
+- name: Sta SSH toe (Cruciaal, anders sluit je jezelf buiten!)
+  ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+
+- name: Sta Portainer toe (HTTPS)
+  ufw:
+    rule: allow
+    port: '9443'
+    proto: tcp
+
+- name: Zet de firewall aan
+  ufw:
+    state: enabled
+    policy: deny
