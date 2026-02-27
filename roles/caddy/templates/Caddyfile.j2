@@ -1,9 +1,19 @@
-# Je hoofd-dashboard
+{
+    # Algemene instellingen
+    admin off
+    
+    # Log alles naar een bestand dat CrowdSec kan lezen
+    log {
+        output file /etc/caddy/access.log
+    }
+}
+
+# Je Flame Dashboard
 {{ duckdns_domain }}.duckdns.org {
     reverse_proxy localhost:5005
 }
 
-# Optioneel: Portainer op een subdomein
+# Portainer op een subdomein
 portainer.{{ duckdns_domain }}.duckdns.org {
     reverse_proxy localhost:9443 {
         transport http {

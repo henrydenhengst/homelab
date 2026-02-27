@@ -6,6 +6,13 @@
     owner: "{{ main_user }}"
     mode: '0755'
 
+- name: Zorg dat access.log bestaat (voorkomt directory-creatie door Docker)
+  file:
+    path: /opt/caddy/access.log
+    state: touch
+    owner: "{{ main_user }}"
+    mode: '0644'
+
 - name: Plaats de Caddyfile
   template:
     src: Caddyfile.j2
@@ -21,5 +28,6 @@
     network_mode: host
     volumes:
       - /opt/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - /opt/caddy/access.log:/etc/caddy/access.log
       - caddy_data:/data
       - caddy_config:/config
