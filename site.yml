@@ -1,7 +1,12 @@
 ---
-- hosts: all
+- name: Configureer Homelab Server
+  hosts: all
   become: yes
   roles:
     - security
     - docker
     - portainer
+    - postgres
+    - rsync
+    - rclone
+    - flame

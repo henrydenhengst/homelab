@@ -1,0 +1,12 @@
+---
+- name: Installeer Rclone
+  apt:
+    name: rclone
+    state: present
+
+- name: Maak directory voor Rclone configuratie
+  file:
+    path: /opt/backups/rclone
+    state: directory
+    mode: '0700'
+    owner: henry

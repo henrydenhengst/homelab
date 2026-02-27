@@ -16,6 +16,12 @@
     port: '9443'
     proto: tcp
 
+- name: Sta Flame Dashboard toe
+  ufw:
+    rule: allow
+    port: '5005'
+    proto: tcp
+
 - name: Zet de firewall aan
   ufw:
     state: enabled

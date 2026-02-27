@@ -32,8 +32,8 @@
     state: started
     enabled: yes
 
-- name: Voeg gebruiker 'henry' toe aan de docker groep
+- name: Voeg gebruiker toe aan de docker groep
   user:
-    name: henry
+    name: "{{ main_user }}"
     groups: docker
     append: yes

@@ -1,0 +1,6 @@
+#!/bin/bash
+SOURCE="/opt"
+DEST="/opt/backups/rsync/latest"
+
+# Maak een backup van /opt maar sla de backup map zelf over
+rsync -av --delete --exclude 'backups/' $SOURCE $DEST
