@@ -1,0 +1,31 @@
+---
+- name: Maak directories voor Mosquitto data
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ docker_base_path }}/mosquitto/config"
+    - "{{ docker_base_path }}/mosquitto/data"
+    - "{{ docker_base_path }}/mosquitto/log"
+
+- name: Plaats Mosquitto configuratie
+  template:
+    src: mosquitto.conf.j2
+    dest: "{{ docker_base_path }}/mosquitto/config/mosquitto.conf"
+    mode: '0644'
+
+- name: Start Mosquitto container
+  docker_container:
+    name: mosquitto
+    image: eclipse-mosquitto:latest
+    restart_policy: unless-stopped
+    state: started
+    published_ports:
+      - "1883:1883"
+    volumes:
+      - "{{ docker_base_path }}/mosquitto/config:/mosquitto/config"
+      - "{{ docker_base_path }}/mosquitto/data:/mosquitto/data"
+      - "{{ docker_base_path }}/mosquitto/log:/mosquitto/log"
+    networks:
+      - name: t2_network

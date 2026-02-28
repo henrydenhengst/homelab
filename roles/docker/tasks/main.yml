@@ -6,7 +6,7 @@
 
 - name: Installeer benodigde pakketten
   apt:
-    name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release, python3-pip]
+    name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release, python3-pip, python3-docker]
     state: present
     update_cache: yes
 
@@ -37,3 +37,9 @@
     name: "{{ main_user }}"
     groups: docker
     append: yes
+
+# CRUCIAAL: Het netwerk voor al je containers
+- name: Zorg dat het Docker netwerk 't2_network' bestaat
+  docker_network:
+    name: t2_network
+    state: present

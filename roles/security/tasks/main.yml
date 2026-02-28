@@ -4,7 +4,7 @@
     name: ufw
     state: present
 
-- name: Sta SSH toe (Cruciaal, anders sluit je jezelf buiten!)
+- name: Sta SSH toe (Cruciaal!)
   ufw:
     rule: allow
     port: '22'
@@ -20,6 +20,24 @@
   ufw:
     rule: allow
     port: '5005'
+    proto: tcp
+
+- name: Sta Zigbee2MQTT Frontend toe
+  ufw:
+    rule: allow
+    port: '8080'
+    proto: tcp
+
+- name: Sta Home Assistant toe
+  ufw:
+    rule: allow
+    port: '8123'
+    proto: tcp
+
+- name: Sta MQTT toe (voor lokale sensoren/clients)
+  ufw:
+    rule: allow
+    port: '1883'
     proto: tcp
 
 - name: Sta HTTP toe (voor SSL verificatie)

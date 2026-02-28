@@ -1,0 +1,79 @@
+---
+# 1. Installatie van de benodigde tools
+- name: Installeer hardware scan tools
+  apt:
+    name: [usbutils, bluez, hwdata]
+    state: present
+    update_cache: yes
+
+# 2. De Scan (Directe Shell methode voor maximale betrouwbaarheid)
+- name: Scan USB devices via shell
+  shell: "ls -1 /dev/serial/by-id/* 2>/dev/null"
+  register: shell_serials
+  changed_when: false
+  failed_when: false
+
+# 3. DYNAMISCHE MAPPING
+- name: Identificeer Zigbee Hardware
+  set_fact:
+    zigbee_device: "{{ item }}"
+  loop: "{{ shell_serials.stdout_lines | default([]) }}"
+  when: 
+    - zigbee_device is not defined
+    - >
+      item is search('1a86', ignorecase=True) or 
+      item is search('usb_serial', ignorecase=True) or 
+      item is search('zigbee', ignorecase=True) or 
+      item is search('conbee', ignorecase=True) or 
+      item is search('ti_usb', ignorecase=True) or
+      item is search('texas', ignorecase=True) or
+      item is search('cp210', ignorecase=True) or
+      item is search('sonoff', ignorecase=True)
+
+- name: Identificeer Z-Wave Hardware
+  set_fact:
+    zwave_device: "{{ item }}"
+  loop: "{{ shell_serials.stdout_lines | default([]) }}"
+  when: 
+    - zwave_device is not defined
+    - >
+      item is search('zwave', ignorecase=True) or 
+      item is search('aeotec', ignorecase=True) or 
+      item is search('zooz', ignorecase=True) or 
+      item is search('0658:0200')
+
+- name: Identificeer RF/SDR Hardware (433Mhz / RTL-SDR)
+  set_fact:
+    rf_sdr_device: "{{ item }}"
+  loop: "{{ shell_serials.stdout_lines | default([]) }}"
+  when: 
+    - rf_sdr_device is not defined
+    - >
+      item is search('rtl', ignorecase=True) or 
+      item is search('sdr', ignorecase=True) or 
+      item is search('rfxtrx', ignorecase=True) or 
+      item is search('433', ignorecase=True)
+
+- name: Identificeer Thread/Matter Hardware
+  set_fact:
+    thread_device: "{{ item }}"
+  loop: "{{ shell_serials.stdout_lines | default([]) }}"
+  when: 
+    - thread_device is not defined
+    - >
+      item is search('nordic', ignorecase=True) or 
+      item is search('nrf', ignorecase=True) or 
+      item is search('silicon labs', ignorecase=True) or 
+      item is search('thread', ignorecase=True) or 
+      item is search('matter', ignorecase=True)
+
+# 4. BLUETOOTH CHECK
+- name: Check of Bluetooth adapter aanwezig is
+  shell: "hciconfig | grep 'UP RUNNING'"
+  register: bluetooth_status
+  changed_when: false
+  failed_when: false
+
+- name: Zet Bluetooth Fact
+  set_fact:
+    bluetooth_available: "{{ bluetooth_status.rc == 0 }}"

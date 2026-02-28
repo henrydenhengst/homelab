@@ -3,12 +3,36 @@
   hosts: all
   become: yes
   roles:
-    - security
-    - docker
-    - portainer
-    - postgres
-    - rsync
-    - rclone
-    - flame
-    - duckdns
-    - caddy
+    # 1. Basis & Beveiliging
+    - role: security
+    - role: docker
+    - role: portainer
+
+    # 2. Opslag & Backup
+    - role: rsync
+    - role: rclone
+
+    # 3. Infrastructuur & Netwerk
+    - role: flame
+    - role: duckdns
+    - role: caddy
+
+    # 4. Hardware Detectie (Zet de variabelen voor stap 6)
+    - role: hardware_discovery
+
+    # 5. Databases & Communicatie
+    - role: postgres
+    - role: mosquitto
+
+    # 6. Smart Home Bridges (Voorwaardelijk)
+    - role: zigbee2mqtt
+      when: zigbee_device is defined
+    - role: zwavejsui
+      when: zwave_device is defined
+    - role: rtl_433
+      when: rf_sdr_device is defined
+    - role: matter_server
+      when: thread_device is defined
+
+    # 7. Het Brein
+    - role: homeassistant

@@ -1,0 +1,2 @@
+# group_vars/all/vars.yml
+docker_base_path: "/opt/docker"  # Of het pad dat jij gebruikt voor je containers

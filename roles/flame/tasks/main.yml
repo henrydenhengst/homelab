@@ -1,0 +1,17 @@
+---
+- name: Maak Flame data volume aan
+  docker_volume:
+    name: flame_data
+
+- name: Start Flame Dashboard container
+  docker_container:
+    name: flame
+    image: pawelmalak/flame:latest
+    state: started
+    restart_policy: unless-stopped
+    volumes:
+      - flame_data:/app/data
+    ports:
+      - "5005:5005"
+    env:
+      PASSWORD: "{{ flame_password }}"

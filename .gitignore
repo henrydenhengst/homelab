@@ -1,56 +1,54 @@
 # =====================================================
-# HOMELAB PROJECT - GITIGNORE (FINAL VERSION)
+# HOMELAB PROJECT - GITIGNORE (UNIVERSEEL)
 # =====================================================
 
 # -------------------------------
-# Environment & Secrets
+# Secrets & Ansible
 # -------------------------------
-# NOOIT je echte tokens en wachtwoorden pushen
 .env
 secrets.yaml
+vault_pass.txt
+.vault_pass
 *.secret
 *.pem
 *.key
 *.crt
-
-# -------------------------------
-# Docker Persistent Data (Database & Config)
-# -------------------------------
-# We sluiten de mappen uit die je containers vullen met data
-postgres/
-mariadb/
-npm/
-gitea/
-vaultwarden/
-flame/
-blinko/
-speedtest-config/
-backrest-config/
-homeassistant/
-mosquitto/
-crowdsec/
-# Voeg hier overige app-mappen toe die data bevatten
-
-# -------------------------------
-# Ansible & Automatisering
-# -------------------------------
 *.retry
 ansible_debug.log
 .ansible_cache/
 group_vars/vault.yml
 vars/secrets.yml
-# De inventory kan IP-adressen bevatten, vaak ook slim om te negeren
-inventory.ini 
 
 # -------------------------------
-# Logs & Tijdelijke bestanden
+# Docker Persistent Data (IGNORE ALL)
 # -------------------------------
+# We negeren de mappen in de root die door Docker gevuld worden.
+# Je configuratie-code leeft veilig in de roles/ map.
+/caddy/
+/crowdsec/
+/duckdns/
+/esphome/
+/flame/
+/gotify/
+/homeassistant/
+/matter_server/
+/mosquitto/
+/portainer/
+/postgres/
+/rtl_433/
+/vaultwarden/
+/zigbee2mqtt/
+/zwavejsui/
+
+# -------------------------------
+# Backup & Logs
+# -------------------------------
+/backups/
+/rclone_config/
+/rsync_logs/
 *.log
 *.bak
-*.old
 *.tmp
-backups/
-node_modules/
 
 # -------------------------------
 # System & IDE
@@ -60,4 +58,3 @@ node_modules/
 .idea/
 *.swp
 __pycache__/
-
