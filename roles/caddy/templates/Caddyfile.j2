@@ -8,16 +8,36 @@
     }
 }
 
-# Je Flame Dashboard
+# 1. Je Flame Dashboard (Hoofdpagina)
 {{ duckdns_domain }}.duckdns.org {
-    reverse_proxy localhost:5005
+    reverse_proxy flame:5005
 }
 
-# Portainer op een subdomein
+# 2. Home Assistant
+home.{{ duckdns_domain }}.duckdns.org {
+    reverse_proxy localhost:8123
+}
+
+# 3. Zigbee2MQTT
+zigbee.{{ duckdns_domain }}.duckdns.org {
+    reverse_proxy zigbee2mqtt:8080
+}
+
+# 4. ESPHome
+esphome.{{ duckdns_domain }}.duckdns.org {
+    reverse_proxy localhost:6052
+}
+
+# 5. Portainer
 portainer.{{ duckdns_domain }}.duckdns.org {
-    reverse_proxy localhost:9443 {
+    reverse_proxy portainer:9443 {
         transport http {
             tls_insecure_skip_verify
         }
     }
+}
+
+# 6. Z-Wave JS UI (Voor de toekomst)
+zwave.{{ duckdns_domain }}.duckdns.org {
+    reverse_proxy zwavejsui:8091
 }

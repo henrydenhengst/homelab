@@ -34,6 +34,24 @@
     port: '8123'
     proto: tcp
 
+- name: Sta ESPHome Dashboard toe
+  ufw:
+    rule: allow
+    port: '6052'
+    proto: tcp
+
+- name: Sta Z-Wave JS UI toe
+  ufw:
+    rule: allow
+    port: '8091'
+    proto: tcp
+
+- name: Sta Matter Server toe
+  ufw:
+    rule: allow
+    port: '5580'
+    proto: tcp
+
 - name: Sta MQTT toe (voor lokale sensoren/clients)
   ufw:
     rule: allow

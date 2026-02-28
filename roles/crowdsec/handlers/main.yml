@@ -1,5 +1,0 @@
----
-- name: Restart CrowdSec Bouncer
-  service:
-    name: crowdsec-firewall-bouncer-iptables
-    state: restarted

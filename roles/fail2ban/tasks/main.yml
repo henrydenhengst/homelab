@@ -1,0 +1,47 @@
+---
+- name: Installeer Fail2Ban
+  apt:
+    name: fail2ban
+    state: present
+    update_cache: yes
+
+- name: Configureer Fail2Ban (Jail voor SSH en Caddy)
+  copy:
+    dest: /etc/fail2ban/jail.local
+    content: |
+      [DEFAULT]
+      bantime   = 1h
+      findtime  = 10m
+      maxretry  = 5
+      banaction = ufw
+
+      [sshd]
+      enabled = true
+
+      [caddy-auth]
+      enabled = true
+      port    = http,https
+      logpath = {{ docker_base_path }}/caddy/access.log
+      filter  = caddy-bad-requests
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Fail2Ban
+
+- name: Maak Filter voor Caddy
+  copy:
+    dest: /etc/fail2ban/filter.d/caddy-bad-requests.conf
+    content: |
+      [Definition]
+      failregex = ^.*"remote_ip":"<HOST>".*"status":(401|403|404).*$
+      ignoreregex =
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Fail2Ban
+
+- name: Zorg dat Fail2Ban draait
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes

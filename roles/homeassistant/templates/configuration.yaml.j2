@@ -1,17 +1,14 @@
-# Basis configuratie
+# Basis configuratie (bevat o.a. discovery, mobile_app, frontend, etc.)
 default_config:
 
-# Frontend (Dashboard)
-frontend:
-
 # Recorder instellen voor PostgreSQL
+# We gebruiken 'postgres_db' (of de naam van je postgres container) in plaats van localhost
 recorder:
-  db_url: postgresql://{{ vault_postgres_user }}:{{ vault_postgres_password }}@localhost/homeassistant
+  db_url: postgresql://{{ vault_postgres_user }}:{{ vault_postgres_password }}@postgres_db/homeassistant
   purge_keep_days: 30
   commit_interval: 10
 
-# Ontdekking van mobiele apps
-mobile_app:
-
-# Notificaties
-discovery:
+# MQTT Integratie - De universele ontvanger voor al je (toekomstige) hardware
+mqtt:
+  broker: mosquitto
+  discovery: true

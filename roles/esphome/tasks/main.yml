@@ -1,0 +1,21 @@
+---
+- name: Maak directory voor ESPHome config
+  file:
+    path: "{{ docker_base_path }}/esphome"
+    state: directory
+    mode: '0755'
+
+- name: Start ESPHome container
+  docker_container:
+    name: esphome
+    image: ghcr.io/esphome/esphome:latest
+    restart_policy: unless-stopped
+    state: started
+    # Network host is nodig om sensoren in je netwerk te ontdekken via mDNS
+    network_mode: host
+    privileged: true
+    volumes:
+      - "{{ docker_base_path }}/esphome:/config"
+      - /etc/localtime:/etc/localtime:ro
+    env:
+      TZ: "Europe/Amsterdam"

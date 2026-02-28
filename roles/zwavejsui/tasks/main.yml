@@ -1,0 +1,25 @@
+---
+- name: Maak directory voor Z-Wave JS UI
+  file:
+    path: "{{ docker_base_path }}/zwavejsui"
+    state: directory
+    mode: '0755'
+
+- name: Start Z-Wave JS UI container
+  docker_container:
+    name: zwavejsui
+    image: zwavejs/zwavejs2mqtt:latest
+    restart_policy: unless-stopped
+    state: started
+    published_ports:
+      - "8091:8091" # Web UI
+      - "3000:3000" # Z-Wave JS Server
+    volumes:
+      - "{{ docker_base_path }}/zwavejsui:/usr/src/app/store"
+    devices:
+      - "{{ zwave_device }}:/dev/zwave"
+    networks:
+      - name: t2_network
+    env:
+      TZ: "Europe/Amsterdam"
+  when: zwave_device is defined # <--- De magie: hij doet pas iets als de stick er is

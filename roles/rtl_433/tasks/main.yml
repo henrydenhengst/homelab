@@ -1,0 +1,13 @@
+---
+- name: Start RTL_433 naar MQTT bridge
+  docker_container:
+    name: rtl_433
+    image: hertzg/rtl_433:latest
+    restart_policy: unless-stopped
+    devices:
+      - "{{ rf_sdr_device }}:/dev/bus/usb/001/002" # Voorbeeld pad
+    command: >
+      -F "mqtt://mosquitto:1883,retain=0,devices=rtl_433[/model][/id]"
+    networks:
+      - name: t2_network
+  when: rf_sdr_device is defined

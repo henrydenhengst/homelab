@@ -1,0 +1,21 @@
+---
+- name: Maak directory voor Matter Server data
+  file:
+    path: "{{ docker_base_path }}/matter_server"
+    state: directory
+    mode: '0755'
+
+- name: Start Matter Server container
+  docker_container:
+    name: matter_server
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    restart_policy: unless-stopped
+    state: started
+    network_mode: host
+    privileged: true
+    volumes:
+      - "{{ docker_base_path }}/matter_server:/data"
+      - /run/dbus:/run/dbus:ro
+    # Deze rol draait alleen als je specifiek hardware hebt of de flag aanzet
+    # Voor nu laten we hem skippen tenzij hardware gevonden wordt
+  when: matter_device is defined

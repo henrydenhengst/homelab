@@ -6,6 +6,7 @@
     # 1. Basis & Beveiliging
     - role: security
     - role: docker
+    - role: fail2ban
     - role: portainer
 
     # 2. Opslag & Backup
@@ -32,7 +33,8 @@
     - role: rtl_433
       when: rf_sdr_device is defined
     - role: matter_server
-      when: thread_device is defined
+      when: matter_device is defined
 
-    # 7. Het Brein
+    # 7. Het Brein & Dashboards
     - role: homeassistant
+    - role: esphome

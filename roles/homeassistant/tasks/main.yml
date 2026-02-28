@@ -5,6 +5,15 @@
     state: directory
     mode: '0755'
 
+- name: Plaats Home Assistant configuratie
+  template:
+    src: configuration.yaml.j2
+    dest: "{{ docker_base_path }}/homeassistant/configuration.yaml"
+    mode: '0644'
+    # 'force: no' zorgt dat je eigen wijzigingen in de UI niet worden overschreven.
+    # Verander naar 'yes' als je de file puur vanuit Ansible wilt beheren.
+    force: no 
+
 - name: Start Home Assistant container
   docker_container:
     name: homeassistant
