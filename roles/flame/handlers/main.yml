@@ -1,0 +1,7 @@
+---
+- name: Restart Flame
+  docker_container:
+    name: flame
+    image: pawelmalak/flame:latest
+    state: started
+    restart: yes

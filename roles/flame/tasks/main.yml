@@ -1,7 +1,68 @@
 ---
-- name: Maak Flame data volume aan
-  docker_volume:
-    name: flame_data
+- name: Maak Flame data mappen aan op de host
+  file:
+    path: "{{ docker_base_path }}/flame/data"
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+
+- name: Maak Flame apps configuratie (apps.yml)
+  copy:
+    dest: "{{ docker_base_path }}/flame/data/apps.yml"
+    owner: "1000"
+    group: "1000"
+    mode: '0644'
+    content: |
+      - name: "Beheer & Infrastructuur"
+        items:
+          - name: "Portainer"
+            icon: "docker"
+            url: "https://portainer.{{ duckdns_domain }}.duckdns.org"
+            subtitle: "Container Management"
+          - name: "Caddy"
+            icon: "server-security"
+            url: "https://{{ duckdns_domain }}.duckdns.org"
+            subtitle: "Reverse Proxy Status"
+
+      - name: "Smart Home"
+        items:
+          - name: "Home Assistant"
+            icon: "home-assistant"
+            url: "https://ha.{{ duckdns_domain }}.duckdns.org"
+            subtitle: "Woning Automatisering"
+          - name: "Zigbee2MQTT"
+            icon: "zigbee"
+            url: "https://zigbee.{{ duckdns_domain }}.duckdns.org"
+            subtitle: "Zigbee Netwerk"
+
+      - name: "Systeem Status"
+        items:
+          - name: "Fail2Ban"
+            icon: "shield-check"
+            url: "#"
+            subtitle: "Vesting Beveiliging: Actief"
+  notify: Restart Flame
+
+- name: Maak Flame algemene instellingen (settings.yml)
+  copy:
+    dest: "{{ docker_base_path }}/flame/data/settings.yml"
+    owner: "1000"
+    group: "1000"
+    mode: '0644'
+    content: |
+      app:
+        name: "{{ flame_dashboard_name | default('Henry Homelab') }}"
+        theme: "dark"
+      search:
+        enabled: true
+        engine: "google"
+      weather:
+        enabled: true
+        city: "{{ flame_city | default('Haarlem') }}"
+        location: "{{ flame_lat_long | default('52.3874,4.6462') }}"
+        units: "metric"
+  notify: Restart Flame
 
 - name: Start Flame Dashboard container
   docker_container:
@@ -10,8 +71,8 @@
     state: started
     restart_policy: unless-stopped
     volumes:
-      - flame_data:/app/data
-    ports:
+      - "{{ docker_base_path }}/flame/data:/app/data"
+    published_ports:
       - "5005:5005"
     env:
-      PASSWORD: "{{ flame_password }}"
+      PASSWORD: "{{ flame_password }}" # Komt uit je vault
