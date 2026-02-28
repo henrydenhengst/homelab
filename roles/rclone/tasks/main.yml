@@ -4,9 +4,55 @@
     name: rclone
     state: present
 
-- name: Maak directory voor Rclone configuratie
+- name: Maak directory voor Rclone root config
   file:
-    path: /opt/backups/rclone
+    path: "/root/.config/rclone"
     state: directory
+    owner: root
+    group: root
     mode: '0700'
-    owner: henry
+
+- name: Kopieer Rclone configuratie naar root
+  template:
+    src: rclone.conf.j2
+    dest: "/root/.config/rclone/rclone.conf"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Maak Systeem Backup Script
+  copy:
+    dest: /usr/local/bin/system_backup.sh
+    mode: '0755'
+    owner: root
+    group: root
+    content: |
+      #!/bin/bash
+      # Variabelen
+      DATE=$(date +%Y-%m-%d)
+      BACKUP_NAME="debian-etc-$DATE.tar.gz"
+      TEMP_DIR="/tmp/backup_stage"
+      
+      # Maak temp directory
+      mkdir -p $TEMP_DIR
+      
+      # Pak /etc en belangrijke mappen in
+      # We gebruiken --absolute-names om errors te voorkomen
+      tar -czf $TEMP_DIR/$BACKUP_NAME /etc /usr/local/bin /var/lib/crowdsec/local_api_credentials.yaml
+      
+      # Kopieer naar OneDrive (remote_storage moet overeenkomen met je rclone.conf)
+      rclone copy $TEMP_DIR/$BACKUP_NAME remote_storage:ServerBackup/System/
+      
+      # Schoonmaak
+      rm -rf $TEMP_DIR
+      
+      # Behoud alleen de laatste 7 dagen op OneDrive
+      rclone delete remote_storage:ServerBackup/System/ --min-age 7d
+
+- name: Cronjob voor Systeem Backup (elke nacht om 03:00)
+  cron:
+    name: "Systeem Config naar OneDrive"
+    user: root
+    minute: "0"
+    hour: "3"
+    job: "/usr/local/bin/system_backup.sh"
