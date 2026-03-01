@@ -61,7 +61,7 @@
         enabled: true
         city: "{{ flame_city | default('Haarlem') }}"
         location: "{{ flame_lat_long | default('52.3874,4.6462') }}"
-        units: "metric"
+        units: metric
   notify: Restart Flame
 
 - name: Start Flame Dashboard container
@@ -70,9 +70,13 @@
     image: pawelmalak/flame:latest
     state: started
     restart_policy: unless-stopped
+    # HIER GEBEURT DE MAGIE:
+    networks:
+      - name: "t2_network"
+    purge_networks: yes
     volumes:
       - "{{ docker_base_path }}/flame/data:/app/data"
     published_ports:
       - "5005:5005"
     env:
-      PASSWORD: "{{ flame_password }}" # Komt uit je vault
+      PASSWORD: "{{ flame_password }}"
