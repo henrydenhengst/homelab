@@ -76,6 +76,7 @@ High-end privacy hoeft niet duur te zijn. Dit project bewijst dat je met:
 ## 🚀 Snel aan de slag
 
 ### 1. Repository Clonen
+
 ```bash
 git clone [https://github.com/henrydenhengst/homelab.git](https://github.com/henrydenhengst/homelab.git)
 cd homelab
