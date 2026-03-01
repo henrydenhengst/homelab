@@ -22,6 +22,19 @@ Waarom moeilijk doen als het efficiënt kan? Dit project volgt drie kernprincipe
 * **Local First:** Data blijft binnen de muren van mijn homelab.
 * **Open Source:** Alle gebruikte rollen (Caddy, Home Assistant, Mosquitto) zijn 100% transparant en auditeerbaar.
 
+---
+
+## 🌍 Duurzaam & Toegankelijk
+High-end privacy hoeft niet duur te zijn. Dit project bewijst dat je met:
+* **Hardware van 15 jaar oud:** Geef die oude laptop of desktop een tweede leven.
+* **Betaalbare 'Goodies':** Slimme uitbreidingen via Amazon of AliExpress (Zigbee, Bluetooth).
+* **Open Source Software:** Geen licentiekosten, geen abonnementen.
+
+...een systeem kunt bouwen dat veiliger en krachtiger is dan de gemiddelde commerciële 'smart home' hub. **Privacy is voor iedereen binnen bereik.** ✊
+
+---
+
+
 
 ---
 
