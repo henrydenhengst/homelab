@@ -34,10 +34,6 @@ High-end privacy hoeft niet duur te zijn. Dit project bewijst dat je met:
 
 ---
 
-
-
----
-
 ## 🏗️ Project Structuur
 
 ### 🛠️ Basis & Hardening
@@ -61,6 +57,18 @@ High-end privacy hoeft niet duur te zijn. Dit project bewijst dat je met:
 | `zigbee2mqtt` | Communicatie met Zigbee hardware (incl. Bluetooth ondersteuning). |
 | `mosquitto` | De MQTT-broker voor alle sensorinformatie. |
 
+---
+
+## 📺 Media, YouTube & Websites
+
+### 🐳 Containers & Automatisering
+* **[Sven's Tech Corner (YouTube)](https://www.youtube.com/@SvensTechCorner)** - Uitstekende uitleg over **Docker** en containers. Ideaal voor wie wil begrijpen hoe software 'verpakt' wordt.
+* **[Ansible voor Beginners](https://www.computable.nl/artikel/achtergrond/beheer/6910620/5241036/wat-is-ansible-eigenlijk.html)** - Een heldere introductie in de kracht van automatisering zonder typefouten.
+
+### 🏠 Home Assistant & Smarthome
+* **[HW-Install (YouTube)](https://www.youtube.com/@HWInstall)** - Dé plek voor diepgaande video's over Home Assistant installaties en hardware-tips.
+* **[Tweakers.net - Home Automation Forum](https://gathering.tweakers.net/forum/list_topics/82)** - De grootste en meest behulpzame Nederlandstalige community voor al je vragen.
+* **[Home Assistant Community (NL sectie)](https://community.home-assistant.io/c/non-english/nederlands-dutch/27)** - Directe hulp van mede-gebruikers in je eigen taal.
 
 
 ---
