@@ -1,7 +1,6 @@
+mkdir -p group_vars/all
+cat << 'EOF' > group_vars/all/vars.yml
 ---
-# --- Paden ---
-docker_base_path: "/opt/docker"
-
 # --- Domein Instellingen ---
 domain: "duckdns.org"
 acme_email: "henrydenhengst@gmail.com"
@@ -15,3 +14,4 @@ portainer_subdomain: "portainer"
 
 # --- Netwerk Instellingen ---
 docker_network_name: "t2_network"
+EOF

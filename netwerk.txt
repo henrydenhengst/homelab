@@ -3,7 +3,7 @@
   hosts: all
   become: yes
   roles:
-    # 1. Basis & Infrastructuur
+    # 1. Basis & Beveiliging
     - role: security
     - role: docker
     - role: fail2ban
@@ -13,16 +13,19 @@
     - role: rsync
     - role: rclone
 
-    # 3. Databases & Communicatie
+    # 3. Infrastructuur & Netwerk
+    - role: flame
+    - role: duckdns
+    - role: caddy
+
+    # 4. Hardware Detectie (Zet de variabelen voor stap 6)
+    - role: hardware_discovery
+
+    # 5. Databases & Communicatie
     - role: postgres
     - role: mosquitto
 
-    # 4. Dashboards & Apps (Bridge Mode)
-    - role: flame
-    - role: homepage
-
-    # 5. Hardware Detectie & Bridges
-    - role: hardware_discovery
+    # 6. Smart Home Bridges (Voorwaardelijk)
     - role: zigbee2mqtt
       when: zigbee_device is defined
     - role: zwavejsui
@@ -32,10 +35,6 @@
     - role: matter_server
       when: matter_device is defined
 
-    # 6. Het Brein
+    # 7. Het Brein & Dashboards
     - role: homeassistant
     - role: esphome
-
-    # 7. De Poortwachter (Caddy als allerlaatste)
-    - role: duckdns
-    - role: caddy

@@ -1,43 +1,25 @@
 {
-    # Algemene instellingen
-    admin off
-    
-    # Log alles naar een bestand dat CrowdSec kan lezen
-    log {
-        output file /etc/caddy/access.log
-    }
+    email {{ acme_email }}
 }
 
-# 1. Je Flame Dashboard (Hoofdpagina)
-{{ duckdns_domain }}.duckdns.org {
+# --- Bridge Apps (Direct via Docker DNS) ---
+{{ flame_subdomain }}.{{ domain }} {
     reverse_proxy flame:5005
 }
 
-# 2. Home Assistant
-home.{{ duckdns_domain }}.duckdns.org {
-    reverse_proxy localhost:8123
-}
-
-# 3. Zigbee2MQTT
-zigbee.{{ duckdns_domain }}.duckdns.org {
+{{ zigbee_subdomain }}.{{ domain }} {
     reverse_proxy zigbee2mqtt:8080
 }
 
-# 4. ESPHome
-esphome.{{ duckdns_domain }}.duckdns.org {
-    reverse_proxy localhost:6052
+{{ portainer_subdomain }}.{{ domain }} {
+    reverse_proxy portainer:9000
 }
 
-# 5. Portainer
-portainer.{{ duckdns_domain }}.duckdns.org {
-    reverse_proxy portainer:9443 {
-        transport http {
-            tls_insecure_skip_verify
-        }
-    }
+# --- Host Mode Apps (Via Docker Gateway IP) ---
+{{ ha_subdomain }}.{{ domain }} {
+    reverse_proxy 172.17.0.1:8123
 }
 
-# 6. Z-Wave JS UI (Voor de toekomst)
-zwave.{{ duckdns_domain }}.duckdns.org {
-    reverse_proxy zwavejsui:8091
+{{ esphome_subdomain }}.{{ domain }} {
+    reverse_proxy 172.17.0.1:6052
 }

@@ -1,0 +1,27 @@
+---
+- name: Maak mappen voor Homepage
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "/opt/docker/homepage"
+    - "/opt/docker/homepage/config"
+
+- name: Configureer Homepage Services
+  template:
+    src: services.yaml.j2
+    dest: "/opt/docker/homepage/config/services.yaml"
+    mode: '0644'
+
+- name: Start Homepage Container
+  docker_container:
+    name: homepage
+    image: ghcr.io/gethomepage/homepage:latest
+    state: started
+    restart_policy: unless-stopped
+    networks:
+      - name: t2_network
+    volumes:
+      - "/opt/docker/homepage/config:/app/config"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"

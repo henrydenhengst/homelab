@@ -1,0 +1,25 @@
+=== 1. CHECKING NETWORK DEFINITIONS ===
+roles/esphome/tasks/main.yml:    network_mode: host
+roles/homeassistant/tasks/main.yml:    network_mode: host
+roles/matter_server/tasks/main.yml:    network_mode: host
+roles/caddy/tasks/main.yml:    network_mode: host
+roles/homepage/tasks/main.yml-      - name: t2_network
+roles/mosquitto/tasks/main.yml-      - name: t2_network
+roles/rtl_433/tasks/main.yml-      - name: t2_network
+roles/dashy/tasks/main.yml-      - name: t2_network
+roles/zwavejsui/tasks/main.yml-      - name: t2_network
+roles/zigbee2mqtt/tasks/main.yml-      - name: t2_network
+
+=== 2. CHECKING CADDY PROXY TARGETS ===
+    reverse_proxy flame:5005
+    reverse_proxy localhost:8123
+    reverse_proxy zigbee2mqtt:8080
+    reverse_proxy localhost:6052
+    reverse_proxy portainer:9443 {
+    reverse_proxy zwavejsui:8091
+
+=== 3. CHECKING CONTAINER NAMES (Internal DNS) ===
+
+=== 4. CHECKING PORT CONFLICTS ===
+      5 --
+Geen dubbele poorten gevonden.

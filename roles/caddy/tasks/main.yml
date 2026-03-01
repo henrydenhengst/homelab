@@ -1,33 +1,32 @@
 ---
-- name: Maak directory voor Caddy data
+- name: Maak Caddy data mappen aan
   file:
-    path: /opt/caddy
+    path: "{{ item }}"
     state: directory
-    owner: "{{ main_user }}"
     mode: '0755'
+  with_items:
+    - /opt/docker/caddy
+    - /opt/docker/caddy/data
+    - /opt/docker/caddy/config
 
-- name: Zorg dat access.log bestaat (voorkomt directory-creatie door Docker)
-  file:
-    path: /opt/caddy/access.log
-    state: touch
-    owner: "{{ main_user }}"
-    mode: '0644'
-
-- name: Plaats de Caddyfile
+- name: Kopieer Caddyfile template
   template:
     src: Caddyfile.j2
-    dest: /opt/caddy/Caddyfile
-    owner: "{{ main_user }}"
+    dest: /opt/docker/caddy/Caddyfile
+  notify: Restart Caddy
 
 - name: Start Caddy container
   docker_container:
     name: caddy
     image: caddy:latest
     state: started
-    restart_policy: unless-stopped
-    network_mode: host
+    restart_policy: always
+    networks:
+      - name: "{{ docker_network_name }}"
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - /opt/caddy/Caddyfile:/etc/caddy/Caddyfile
-      - /opt/caddy/access.log:/etc/caddy/access.log
-      - caddy_data:/data
-      - caddy_config:/config
+      - /opt/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - /opt/docker/caddy/data:/data
+      - /opt/docker/caddy/config:/config
