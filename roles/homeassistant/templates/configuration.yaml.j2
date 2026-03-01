@@ -1,14 +1,25 @@
-# Basis configuratie (bevat o.a. discovery, mobile_app, frontend, etc.)
+# Basis configuratie
 default_config:
 
+# REVERSE PROXY FIX (Dit lost de SSL/Protocol error op)
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.21.0.0/16
+    - 127.0.0.1
+
 # Recorder instellen voor PostgreSQL
-# We gebruiken 'postgres_db' (of de naam van je postgres container) in plaats van localhost
 recorder:
   db_url: postgresql://{{ vault_postgres_user }}:{{ vault_postgres_password }}@postgres_db/homeassistant
   purge_keep_days: 30
   commit_interval: 10
 
-# MQTT Integratie - De universele ontvanger voor al je (toekomstige) hardware
+# MQTT Integratie
 mqtt:
   broker: mosquitto
   discovery: true
+
+# URLs instellen
+homeassistant:
+  external_url: "https://ha.{{ duckdns_domain }}.duckdns.org"
+  internal_url: "http://homeassistant:8123"

@@ -10,21 +10,23 @@
     src: configuration.yaml.j2
     dest: "{{ docker_base_path }}/homeassistant/configuration.yaml"
     mode: '0644'
-    # 'force: no' zorgt dat je eigen wijzigingen in de UI niet worden overschreven.
-    # Verander naar 'yes' als je de file puur vanuit Ansible wilt beheren.
-    force: no 
+    force: yes # Dwingt de nieuwe HTTP-proxy instellingen af
 
 - name: Start Home Assistant container
   docker_container:
     name: homeassistant
     image: ghcr.io/home-assistant/home-assistant:stable
+    state: started
     restart_policy: unless-stopped
-    network_mode: host
+    networks:
+      - name: "t2_network"
+    purge_networks: yes
     privileged: true
     volumes:
       - "{{ docker_base_path }}/homeassistant:/config"
       - /etc/localtime:/etc/localtime:ro
-      - /run/dbus:/run/dbus:ro  # Nodig voor Bluetooth discovery
+      - /run/dbus:/run/dbus:ro
     env:
       TZ: "Europe/Amsterdam"
-    state: started
+    published_ports:
+      - "8123:8123"

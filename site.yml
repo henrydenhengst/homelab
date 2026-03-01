@@ -19,7 +19,6 @@
 
     # 4. Dashboards & Apps (Bridge Mode)
     - role: flame
-    - role: homepage
 
     # 5. Hardware Detectie & Bridges
     - role: hardware_discovery

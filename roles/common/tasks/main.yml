@@ -1,0 +1,31 @@
+---
+# 1. De "Niet op mijn server!" lijst
+- name: Dwing een Lean & Mean systeem af (Verwijder ballast)
+  apt:
+    name:
+      - texlive* # Dag LaTeX
+      - x11-common      # Dag GUI
+      - java-common     # Dag Java restanten
+      - adwaita-icon-theme
+      - desktop-file-utils
+      - ruby*
+      - ispell
+      - iamerican
+      - ibritish
+      - fonts-* # Verwijder alle onnodige lettertypes
+    state: absent
+    purge: yes          # Verwijder ook de configuratiebestanden!
+
+# 2. De "Gereedschapskist" lijst
+- name: Installeer alleen wat echt nodig is
+  apt:
+    name:
+      - curl
+      - git
+      - btop
+      - ncdu
+      - ufw
+      - fail2ban
+      - bluez           # Voor je dongle!
+    state: present
+    update_cache: yes
