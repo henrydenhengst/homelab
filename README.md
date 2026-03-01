@@ -77,6 +77,8 @@ High-end privacy hoeft niet duur te zijn. Dit project bewijst dat je met:
 
 ### 1. Repository Clonen
 
-```bash
 git clone [https://github.com/henrydenhengst/homelab.git](https://github.com/henrydenhengst/homelab.git)
+
+```bash
 cd homelab
+ansible-playbook -i inventory.yml site.yml
