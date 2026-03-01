@@ -4,6 +4,7 @@
   become: yes
   roles:
     # 1. Basis & Infrastructuur
+    - role: common
     - role: security
     - role: docker
     - role: fail2ban
