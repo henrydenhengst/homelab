@@ -77,8 +77,16 @@ High-end privacy hoeft niet duur te zijn. Dit project bewijst dat je met:
 
 ### 1. Repository Clonen
 
-git clone [https://github.com/henrydenhengst/homelab.git](https://github.com/henrydenhengst/homelab.git)
-
 ```bash
+git clone https://github.com/henrydenhengst/homelab.git
 cd homelab
 ansible-playbook -i inventory.yml site.yml
+
+
+### 🔐 Beveiliging (Jouw Geheimen)
+Dit project gebruikt **Ansible Vault** om gevoelige data (zoals je DuckDNS token) te beschermen.
+
+1. **Maak je eigen kluis aan:**
+   Kopieer het voorbeeld naar een echt vault-bestand:
+   ```bash
+   cp vault.yml.example group_vars/all/vault.yml
