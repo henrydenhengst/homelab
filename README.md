@@ -63,12 +63,13 @@ Dit project is zelf-documenterend. Na elke run genereert Ansible een professione
 ## 📺 Media, YouTube & Websites
 
 ### 🌿 De Basis: Git & Docker
-* **[Git Crash Course](https://www.youtube.com/watch?v=mAFoROnOfHs)** *Snelcursus codebeheer.*
-* **[Docker Roadmap](https://www.youtube.com/watch?v=zFa9_K8BS8I)** *Alles over containers.*
+* **[Git Crash Course](https://www.youtube.com/watch?v=mAFoROnOfHs)** *Snelcursus om te begrijpen hoe je code beheert en veilig naar GitHub pusht.*
+* **[Docker Roadmap: Beginner to Pro](https://www.youtube.com/watch?v=zFa9_K8BS8I)** *Alles over containers, van je eerste 'hello world' tot complexe omgevingen.*
 
 ### 🤖 Automatisering: Ansible
-* **[Ansible Quick Start](https://www.youtube.com/watch?v=p9bda0-TIRc)** *Playbooks en Roles begrijpen.*
-* **[Ansible Deep Dive Playlist](https://www.youtube.com/playlist?list=PL2_OBreMn7FqZkvMYt6ATmgC0KAGGJNAN)** *Geavanceerde configuraties.*
+* **[Ansible Quick Start Course](https://www.youtube.com/watch?v=p9bda0-TIRc)** *De snelste manier om te begrijpen hoe Playbooks en Roles samenwerken.*
+* **[Ansible Deep Dive - Playlist Deel 1](https://www.youtube.com/playlist?list=PL2_OBreMn7FqZkvMYt6ATmgC0KAGGJNAN)** *Grondige uitleg over de architectuur van Ansible.*
+* **[Ansible Deep Dive - Playlist Deel 2](https://www.youtube.com/playlist?list=PLT98CRl2KxKEUHie1m24-wkyHpEsa4Y70)** *Geavanceerde configuraties voor de echte power-user.*
 
 ---
 
@@ -84,34 +85,6 @@ Zorg dat je zonder wachtwoord kunt inloggen op je server:
 ```bash
 ssh-keygen -t ed25519
 ssh-copy-id $USER@<server-ip>
----
-
-## 🚀 Snel aan de slag
-
-### 1. Voorbereiding (Laptop/PC)
-Installeer de PDF-motor op je eigen machine:
-* **MacOS:** `brew install pango && pip3 install weasyprint`
-* **Windows (WSL2) / Linux:** `sudo apt install python3-weasyprint -y`
-
-### 2. SSH Handdruk & Rechten
-Zorg dat je zonder wachtwoord kunt inloggen op je server:
-```bash
-ssh-keygen -t ed25519
-ssh-copy-id $USER@<server-ip>
-
----
-
-## 📺 Media, YouTube & Websites
-
-### 🌿 De Basis: Git & Docker
-* **[Git Crash Course](https://www.youtube.com/watch?v=mAFoROnOfHs)** *Snelcursus om te begrijpen hoe je code beheert en veilig naar GitHub pusht.*
-* **[Docker Roadmap: Beginner to Pro](https://www.youtube.com/watch?v=zFa9_K8BS8I)** *Alles over containers, van je eerste 'hello world' tot complexe omgevingen.*
-
-### 🤖 Automatisering: Ansible
-* **[Ansible Quick Start Course](https://www.youtube.com/watch?v=p9bda0-TIRc)** *De snelste manier om te begrijpen hoe Playbooks en Roles samenwerken.*
-* **[Ansible Deep Dive - Playlist Deel 1](https://www.youtube.com/playlist?list=PL2_OBreMn7FqZkvMYt6ATmgC0KAGGJNAN)** *Grondige uitleg over de architectuur van Ansible.*
-* **[Ansible Deep Dive - Playlist Deel 2](https://www.youtube.com/playlist?list=PLT98CRl2KxKEUHie1m24-wkyHpEsa4Y70)** *Geavanceerde configuraties voor de echte power-user.*
-
 ---
 
 ## 🚀 Snel aan de slag
