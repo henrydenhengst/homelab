@@ -81,17 +81,13 @@ Installeer de PDF-motor op je eigen machine:
 * **Windows (WSL2) / Linux:** `sudo apt update && sudo apt install python3-weasyprint -y`
 
 ### 2. SSH Handdruk & Rechten
+Vergeet de inventory.yml niet aan te passen met jouw server(s)!
 Zorg dat je zonder wachtwoord kunt inloggen op je server:
 ```bash
 ssh-keygen -t ed25519
 ssh-copy-id $USER@<server-ip>
----
 
-## 🚀 Snel aan de slag
-
-### 1. Repository Clonen
-
-Vergeet de inventory.yml niet aan te passen met jouw server(s)!
+# Repository Clonen
 
 git clone https://github.com/henrydenhengst/homelab.git
 cd homelab
@@ -106,4 +102,3 @@ ansible-vault encrypt group_vars/all/vault.yml
 
 # Eerste run (inclusief privilege escalation)
 ansible-playbook -i inventory.ini site.yml --ask-vault-pass --ask-become-pass
-
