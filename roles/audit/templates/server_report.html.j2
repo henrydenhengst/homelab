@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Helvetica', sans-serif; color: #2c3e50; padding: 40px; }
+        .header { border-bottom: 4px solid #34495e; padding-bottom: 10px; margin-bottom: 30px; }
+        .badge { 
+            float: right; padding: 20px; border-radius: 8px; color: white; font-weight: bold;
+            background: {{ '#27ae60' if (lynis_raw.stdout|default(0)|int > 70) else '#e67e22' if (lynis_raw.stdout|default(0)|int > 50) else '#c0392b' }};
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ecf0f1; }
+        th { background: #f8f9fa; color: #7f8c8d; text-transform: uppercase; font-size: 12px; }
+        .footer { margin-top: 60px; font-size: 0.8em; color: #bdc3c7; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="badge">
+        LYNIS SCORE<br>
+        <span style="font-size: 28px;">{{ lynis_raw.stdout | default('0') | trim }}%</span>
+    </div>
+    <div class="header">
+        <h1>Server Audit Rapport</h1>
+        <p>Beheerder: <strong>{{ audit_owner }}</strong> | Host: <strong>{{ inventory_hostname }}</strong></p>
+    </div>
+    
+    <h3>Systeem Specificaties</h3>
+    <table>
+        <tr><th>Onderdeel</th><th>Waarde</th></tr>
+        <tr><td>Besturingssysteem</td><td>{{ ansible_distribution }} {{ ansible_distribution_version }}</td></tr>
+        <tr><td>Kernel</td><td>{{ ansible_kernel }}</td></tr>
+        <tr><td>CPU / Cores</td><td>{{ ansible_processor_vcpus }} vCPUs</td></tr>
+        <tr><td>Geheugen (RAM)</td><td>{{ (ansible_memtotal_mb / 1024) | round(2) }} GB</td></tr>
+        <tr><td>IP Adres</td><td>{{ ansible_default_ipv4.address }}</td></tr>
+    </table>
+
+    <h3>Actieve Docker Services</h3>
+    <ul>
+    {% for name in docker_names.stdout_lines %}
+        <li><strong>{{ name }}</strong></li>
+    {% else %}
+        <li><em>Geen containers actief op dit systeem.</em></li>
+    {% endfor %}
+    </ul>
+
+    <div class="footer">
+        Dit rapport is automatisch gegenereerd voor henry op {{ ansible_date_time.date }}
+    </div>
+</body>
+</html>

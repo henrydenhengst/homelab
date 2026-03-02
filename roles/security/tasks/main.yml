@@ -74,3 +74,18 @@
   ufw:
     state: enabled
     policy: deny
+
+- name: "Lynis: Installeer audit tool"
+  package:
+    name: lynis
+    state: present
+
+- name: "Lynis: Controleer of het rapportbestand al bestaat"
+  stat:
+    path: /var/log/lynis-report.dat
+  register: lynis_report
+
+- name: "Lynis: Draai de eerste systeem audit (dit duurt even)"
+  command: lynis audit system --quick
+  when: not lynis_report.stat.exists
+  # We gebruiken --quick om te voorkomen dat hij op user-input wacht

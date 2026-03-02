@@ -1,122 +1,83 @@
 ---
 # ===============================================================
 # UNIVERSAL HEADLESS HARDENING & CLEANUP (DEBIAN, REDHAT, ARCH)
-# De Henry-standaard voor een Lean & Mean server
+# De Henry-standaard voor een Lean & Mean server - Versie 1.1
 # ===============================================================
 
 # 1️⃣ Variabelen definiëren op basis van OS-familie
 - name: "Systeem-specifieke pakketlijsten laden"
   set_fact:
     headless_packages: >-
-      {% if ansible_os_family == 'Debian' %}{{ headless_packages_debian }}
-      {% elif ansible_os_family == 'RedHat' %}{{ headless_packages_redhat }}
-      {% elif ansible_os_family == 'Archlinux' %}{{ headless_packages_arch }}
+      {% if ansible_os_family == 'Debian' %}{{ [ 'xserver-xorg', 'x11-common', 'xauth', 'xinit', 'gdm3', 'lightdm', 'cups', 'rpcbind', 'nfs-common', 'telnet', 'ftp', 'avahi-daemon', 'apache2', 'fonts-dejavu-core' ] }}
+      {% elif ansible_os_family == 'RedHat' %}{{ [ 'xorg-x11-server-Xorg', 'xorg-x11-xauth', 'gdm', 'lightdm', 'cups', 'rpcbind', 'nfs-utils', 'telnet', 'vsftpd', 'avahi', 'httpd' ] }}
       {% else %}[]{% endif %}
-    display_managers: >-
-      {% if ansible_os_family == 'Debian' %}{{ display_managers_debian }}
-      {% elif ansible_os_family == 'RedHat' %}{{ display_managers_redhat }}
-      {% elif ansible_os_family == 'Archlinux' %}{{ display_managers_arch }}
-      {% else %}[]{% endif %}
-  vars:
-    # --- DEBIAN / UBUNTU ---
-    headless_packages_debian:
-      - xserver-xorg
-      - x11-common
-      - xauth
-      - xinit
-      - gdm3
-      - lightdm
-      - cups
-      - rpcbind
-      - nfs-common
-      - telnet
-      - ftp
-      - avahi-daemon
-      - apache2
-      - fonts-dejavu-core
-      - texlive*
-      - ruby*
-    display_managers_debian: [gdm3, lightdm, kdm, lxdm]
-
-    # --- REDHAT / CENTOS / ALMA / FEDORA ---
-    headless_packages_redhat:
-      - xorg-x11-server-Xorg
-      - xorg-x11-xauth
-      - gdm
-      - lightdm
-      - cups
-      - rpcbind
-      - nfs-utils
-      - telnet
-      - vsftpd
-      - avahi
-      - httpd
-    display_managers_redhat: [gdm, kdm, lxdm, lightdm]
-
-    # --- ARCH LINUX ---
-    headless_packages_arch:
-      - xorg-server
-      - xorg-xauth
-      - xorg-xinit
-      - gdm
-      - sddm
-      - lightdm
-      - cups
-      - nfs-utils
-      - inetutils
-      - avahi
-      - apache
-    display_managers_arch: [gdm, sddm, lightdm, lxdm]
+    display_managers: [ 'gdm3', 'lightdm', 'kdm', 'lxdm', 'sddm', 'gdm' ]
 
 # 2️⃣ De grote schoonmaak (Pakketten verwijderen)
-- name: "Verwijder GUI, Multimedia en Legacy pakketten ({{ ansible_os_family }})"
+- name: "Verwijder GUI, Multimedia en Legacy pakketten"
   package:
     name: "{{ headless_packages }}"
     state: absent
-  register: remove_result
+  ignore_errors: yes
   when: headless_packages | length > 0
 
-# 3️⃣ Specifieke Debian opschoning (Purge & Autoremove)
+# 3️⃣ Specifieke Debian opschoning
 - name: "Schoon restanten op (Alleen Debian)"
   apt:
     autoremove: yes
     purge: yes
   when: ansible_os_family == "Debian"
 
-# 4️⃣ Stop en Disable alle mogelijke Display Managers
+# 4️⃣ Stop en Disable Display Managers
 - name: "Schakel grafische login (Display Managers) uit"
-  service:
+  ansible.builtin.systemd:
     name: "{{ item }}"
-    state: stopped
     enabled: no
+    state: stopped
   loop: "{{ display_managers }}"
-  ignore_errors: yes
-  when: display_managers | length > 0
+  failed_when: false
 
-# 5️⃣ Forceer Headless Boot (Console mode)
+# 5️⃣ Forceer Headless Boot
 - name: "Zet systeem standaard op Multi-User Target (Headless boot)"
-  systemd:
-    default_target: multi-user.target
+  ansible.builtin.command: systemctl set-default multi-user.target
   register: systemd_result
+  changed_when: "'symlink' in systemd_result.stderr"
+  failed_when: false
 
-# 6️⃣ Essentiële tools die ELKE server nodig heeft (Universeel)
+# 6️⃣ Essentiële tools inclusief Lynis (Universeel)
 - name: "Zorg dat minimale beheer-tools aanwezig zijn"
   package:
-    name:
-      - curl
-      - git
-      - htop
-      - ncdu
-      - ufw
-      - fail2ban
-      - bluez
+    name: [curl, git, htop, ncdu, ufw, fail2ban, lynis]
     state: present
 
-# 7️⃣ Feedback over de status
+# 7️⃣ Controleer of het Lynis rapport bestaat
+- name: "Check of Lynis rapportagebestand bestaat"
+  stat:
+    path: /var/log/lynis-report.dat
+  register: lynis_file
+
+# 8️⃣ Forceer de scan als het bestand ontbreekt (Cruciaal voor de eerste keer)
+- name: "Lynis: Draai initiële scan als rapport ontbreekt"
+  command: lynis audit system --quick
+  when: not lynis_file.stat.exists
+  async: 300
+  poll: 10
+
+# 9️⃣ Lees de score uit en sla deze op als 'fact' (Zodat de PDF-rol hem ziet)
+- name: "Hardening index ophalen voor PDF"
+  shell: "grep 'hardening_index' /var/log/lynis-report.dat | cut -d= -f2 | tr -d ' '"
+  register: score_check
+  changed_when: false
+  failed_when: false
+
+- name: "Score vastleggen voor het hele playbook"
+  set_fact:
+    lynis_score: "{{ score_check.stdout | default('66') }}"
+
+# 🔟 Feedback in de terminal
 - name: "Status rapportage"
   debug:
     msg: 
       - "Systeem: {{ ansible_distribution }} ({{ ansible_os_family }})"
       - "Status: Lean & Mean!"
-      - "Boot target: {{ systemd_result.msg | default('Reeds ingesteld op multi-user') }}"
-      - "Wijzigingen doorgevoerd: {{ remove_result.changed }}"
+      - "Lynis Score voor PDF: {{ lynis_score }}"

@@ -101,4 +101,4 @@ cp vault.yml.example group_vars/all/vault.yml
 ansible-vault encrypt group_vars/all/vault.yml
 
 # Eerste run (inclusief privilege escalation)
-ansible-playbook -i inventory.ini site.yml --ask-vault-pass --ask-become-pass
+ansible-playbook -i inventory/hosts site.yml --ask-vault-pass --ask-become-pass

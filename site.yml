@@ -1,28 +1,35 @@
 ---
+# =================================================================
+# 🚀 Henry's Enterprise Homelab Playbook
+# Doel: Volledige IaC uitrol van OS-hardening tot Home Automation
+# =================================================================
+
 - name: Configureer Homelab Server
   hosts: all
   become: yes
+  
   roles:
-    # 1. Basis & Infrastructuur
-    - role: common
-    - role: security
-    - role: docker
-    - role: fail2ban
-    - role: portainer
+    # -----------------------------------------------------
+    # 1. 🏗️ De Fundering (OS & Security)
+    # -----------------------------------------------------
+    - role: common             # Ballast verwijderen & Sudo setup
+    - role: security           # SSH hardening & OS updates
+    - role: fail2ban           # Brute-force protectie
+    - role: docker             # Docker-CE Engine & Compose installatie
+    - role: portainer          # Visueel container beheer
 
-    # 2. Opslag & Backup
-    - role: rsync
-    - role: rclone
+    # -----------------------------------------------------
+    # 2. 💾 Opslag, Data & Communicatie
+    # -----------------------------------------------------
+    - role: postgres           # Database voor je apps
+    - role: mosquitto          # MQTT Broker (De ruggengraat voor sensoren)
+    - role: rsync              # Lokale synchronisatie/backup
+    - role: rclone             # Cloud-offsite backups
 
-    # 3. Databases & Communicatie
-    - role: postgres
-    - role: mosquitto
-
-    # 4. Dashboards & Apps (Bridge Mode)
-    - role: flame
-
-    # 5. Hardware Detectie & Bridges
-    - role: hardware_discovery
+    # -----------------------------------------------------
+    # 3. 🔍 Hardware & Bridges (Voorwaardelijk)
+    # -----------------------------------------------------
+    - role: hardware_discovery # Detecteert USB/PCI apparaten
     - role: zigbee2mqtt
       when: zigbee_device is defined
     - role: zwavejsui
@@ -32,10 +39,20 @@
     - role: matter_server
       when: matter_device is defined
 
-    # 6. Het Brein
-    - role: homeassistant
-    - role: esphome
+    # -----------------------------------------------------
+    # 4. 🧠 Het Brein & Dashboards
+    # -----------------------------------------------------
+    - role: homeassistant      # Central Smart Home Controller
+    - role: esphome            # Voor je eigen ESP-sensoren
+    - role: flame              # Startpagina / Dashboard
 
-    # 7. De Poortwachter (Caddy als allerlaatste)
-    - role: duckdns
-    - role: caddy
+    # -----------------------------------------------------
+    # 5. 🛡️ De Poortwachter (Netwerk & SSL)
+    # -----------------------------------------------------
+    - role: duckdns            # Dynamische DNS update
+    - role: caddy              # Reverse Proxy met Auto-SSL
+
+    # -----------------------------------------------------
+    # 6. 📊 De Rapporteur (De Finale)
+    # -----------------------------------------------------
+    - role: audit              # Genereert PDF-audit op laptop ($USER)
