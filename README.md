@@ -79,6 +79,7 @@ Zorg dat je zonder wachtwoord kunt inloggen op je server:
 ```bash
 ssh-keygen -t ed25519
 ssh-copy-id $USER@<server-ip>
+
 ---
 
 ## 📺 Media, YouTube & Websites
@@ -100,7 +101,8 @@ ssh-copy-id $USER@<server-ip>
 
 Vergeet de inventory.yml niet aan te passen met jouw server(s)!
 
-git clone [https://github.com/henrydenhengst/homelab.git](https://github.com/henrydenhengst/homelab.git)
+```bash
+git clone https://github.com/henrydenhengst/homelab.git
 cd homelab
 
 # Setup de omgeving voor jouw gebruiker ($USER)
