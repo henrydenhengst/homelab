@@ -50,13 +50,6 @@ Waarom moeilijk doen als het efficiënt kan? Dit project volgt drie kernprincipe
 | `caddy` | Reverse proxy met automatische SSL via Let's Encrypt. |
 | `vaultwarden` | Jouw eigen lokale wachtwoordmanager. |
 
-### 🏠 Home Automation
-| Rol | Doel |
-| :--- | :--- |
-| `homeassistant` | Het centrale brein van de woning. |
-| `zigbee2mqtt` | Communicatie met Zigbee hardware. |
-| `mosquitto` | De MQTT-broker voor alle sensorinformatie. |
-
 ---
 
 ## 📊 Automatische Rapportage (Audit)
@@ -65,6 +58,32 @@ Dit project is zelf-documenterend. Na elke run genereert Ansible een professione
 * **Hardware Specs:** Actueel CPU, RAM en Disk verbruik.
 * **Service Check:** Overzicht van alle actieve Docker containers.
 
+---
+
+## 📺 Media, YouTube & Websites
+
+### 🌿 De Basis: Git & Docker
+* **[Git Crash Course](https://www.youtube.com/watch?v=mAFoROnOfHs)** *Snelcursus codebeheer.*
+* **[Docker Roadmap](https://www.youtube.com/watch?v=zFa9_K8BS8I)** *Alles over containers.*
+
+### 🤖 Automatisering: Ansible
+* **[Ansible Quick Start](https://www.youtube.com/watch?v=p9bda0-TIRc)** *Playbooks en Roles begrijpen.*
+* **[Ansible Deep Dive Playlist](https://www.youtube.com/playlist?list=PL2_OBreMn7FqZkvMYt6ATmgC0KAGGJNAN)** *Geavanceerde configuraties.*
+
+---
+
+## 🚀 Snel aan de slag
+
+### 1. Voorbereiding Laptop/PC
+Installeer de PDF-motor op je eigen machine:
+* **MacOS:** `brew install pango && pip3 install weasyprint`
+* **Windows (WSL2) / Linux:** `sudo apt update && sudo apt install python3-weasyprint -y`
+
+### 2. SSH Handdruk & Rechten
+Zorg dat je zonder wachtwoord kunt inloggen op je server:
+```bash
+ssh-keygen -t ed25519
+ssh-copy-id $USER@<server-ip>
 ---
 
 ## 🚀 Snel aan de slag
