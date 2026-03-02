@@ -1,29 +1,11 @@
 # =====================================================
-# HOMELAB PROJECT - GITIGNORE (UNIVERSEEL)
+# HOMELAB PROJECT - GITIGNORE (VERSIE HENRY)
 # =====================================================
 
-# -------------------------------
-# Secrets & Ansible
-# -------------------------------
-.env
-secrets.yaml
-vault_pass.txt
-.vault_pass
-*.secret
-*.pem
-*.key
-*.crt
-*.retry
-ansible_debug.log
-.ansible_cache/
-group_vars/vault.yml
-vars/secrets.yml
-
-# -------------------------------
-# Docker Persistent Data (IGNORE ALL)
-# -------------------------------
-# We negeren de mappen in de root die door Docker gevuld worden.
-# Je configuratie-code leeft veilig in de roles/ map.
+# -----------------------------------------------------
+# 🐳 DOCKER PERSISTENT DATA (IGNORE)
+# Deze mappen bevatten databases en configs die op de server horen.
+# -----------------------------------------------------
 /caddy/
 /crowdsec/
 /duckdns/
@@ -39,10 +21,37 @@ vars/secrets.yml
 /vaultwarden/
 /zigbee2mqtt/
 /zwavejsui/
+/rclone/
+/rsync/
 
-# -------------------------------
-# Backup & Logs
-# -------------------------------
+# -----------------------------------------------------
+# 🔐 SECRETS & ANSIBLE (SENSITIVE)
+# -----------------------------------------------------
+vault.yml
+group_vars/vault.yml
+vars/secrets.yml
+*.secret
+*.key
+*.pem
+*.crt
+.env
+.vault_pass
+vault_pass.txt
+*.retry
+ansible_debug.log
+
+# -----------------------------------------------------
+# 📊 AUDIT & RAPPORTAGE (PRIVACY)
+# -----------------------------------------------------
+homelab-reports/
+enterprise-audit-reports/
+*.pdf
+*.html
+/tmp/audit_*.html
+
+# -----------------------------------------------------
+# 📂 BACKUPS & LOGS
+# -----------------------------------------------------
 /backups/
 /rclone_config/
 /rsync_logs/
@@ -50,11 +59,19 @@ vars/secrets.yml
 *.bak
 *.tmp
 
-# -------------------------------
-# System & IDE
-# -------------------------------
+# -----------------------------------------------------
+# 💻 SYSTEM & IDE
+# -----------------------------------------------------
 .DS_Store
+Thumbs.db
 .vscode/
 .idea/
-*.swp
 __pycache__/
+*.pyc
+.venv/
+
+# -----------------------------------------------------
+# ✅ WAT BLIJFT ER WEL IN GIT? (Niet negeren)
+# De volgende mappen bevatten je Ansible-code:
+# common, docker, fail2ban, hardware_discovery, security
+# -----------------------------------------------------

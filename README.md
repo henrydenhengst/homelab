@@ -7,30 +7,28 @@
 
 Dit project bevat mijn persoonlijke **Infrastructure as Code (IaC)** suite. Het is ontworpen om een Linux-server volledig te strippen van ballast (GUI, X11, LaTeX) en om te toveren tot een gestroomlijnde, headless Docker-host.
 
+---
 
+## 🏗️ Systeemvereisten
+
+### 🔌 Hardware (Server)
+* **CPU:** Minimaal 2 Cores (Intel N100, Raspberry Pi 4/5 of oude laptop/desktop).
+* **RAM:** 4GB minimaal (8GB aanbevolen voor data-analyse & InfluxDB).
+* **Opslag:** 32GB+ SSD/NVMe (Vermijd SD-kaarten voor database-stabiliteit).
+* **Extra:** Externe USB backup-disk & Zigbee dongle (SkyConnect/Sonoff).
+
+### 💻 Software (Control Node - Jouw Laptop/PC)
+* **OS:** MacOS, Linux of Windows (via **WSL2**).
+* **Python:** 3.10+ (nodig voor de PDF-rapportage engine `weasyprint`).
+* **SSH:** Sleutel-gebaseerde authenticatie is vereist voor automatisering.
 
 ---
 
 ## 🎯 De Filosofie
 Waarom moeilijk doen als het efficiënt kan? Dit project volgt drie kernprincipes:
-1.  **Headless by Default:** Geen schermen, geen verspilde RAM. Alles via SSH en Web-UI.
-2.  **OS-Agnostisch:** Of je nu **Debian**, **RedHat** of **Arch Linux** draait; de "Henry-standaard" wordt overal afgedwongen.
-3.  **Idempotentie:** Je kunt het playbook op elk moment draaien om je systeem terug te brengen naar de perfecte staat.
-
-## 🛡️ Privacy & Open Source Statement
-* **Zero Tracking:** Geen Google Analytics of externe scripts.
-* **Local First:** Data blijft binnen de muren van mijn homelab.
-* **Open Source:** Alle gebruikte rollen (Caddy, Home Assistant, Mosquitto) zijn 100% transparant en auditeerbaar.
-
----
-
-## 🌍 Duurzaam & Toegankelijk
-High-end privacy hoeft niet duur te zijn. Dit project bewijst dat je met:
-* **Hardware van 15 jaar oud:** Geef die oude laptop of desktop een tweede leven.
-* **Betaalbare 'Goodies':** Slimme uitbreidingen via Amazon of AliExpress (Zigbee, Bluetooth).
-* **Open Source Software:** Geen licentiekosten, geen abonnementen.
-
-...een systeem kunt bouwen dat veiliger en krachtiger is dan de gemiddelde commerciële 'smart home' hub. **Privacy is voor iedereen binnen bereik.** ✊
+1. **Headless by Default:** Geen schermen, geen verspilde RAM. Alles via SSH en Web-UI.
+2. **OS-Agnostisch:** Of je nu **Debian**, **Ubuntu** of **RedHat** draait; de "Henry-standaard" wordt overal afgedwongen.
+3. **Idempotentie:** Je kunt het playbook op elk moment draaien om je systeem terug te brengen naar de perfecte staat.
 
 ---
 
@@ -39,37 +37,60 @@ High-end privacy hoeft niet duur te zijn. Dit project bewijst dat je met:
 ### 🛠️ Basis & Hardening
 | Rol | Taak | Status |
 | :--- | :--- | :--- |
-| `common` | **De Bezem:** Verwijdert GUI/X11/LaTeX ballast & stelt `multi-user.target` in. | ✅ Actief |
-| `security` | Systeem-updates en SSH-hardening. | ✅ Actief |
+| `common` | **De Bezem:** Verwijdert GUI/ballast & stelt passwordless sudo in voor `$USER`. | ✅ Actief |
+| `security` | Systeem-updates, SSH-hardening en Lynis security scans. | ✅ Actief |
 | `fail2ban` | Bescherming tegen brute-force aanvallen. | ✅ Actief |
+| `audit` | **De Rapporteur:** Genereert automatische PDF-audits van je hardware & security. | ✅ Actief |
 
 ### 🐳 Container Stack
 | Rol | Functionaliteit |
 | :--- | :--- |
 | `docker` | Installatie van de officiële Docker-CE engine. |
 | `portainer` | Visueel beheer van al je containers. |
-| `caddy` | **De Poortwachter:** Reverse proxy met automatische SSL via Let's Encrypt. |
+| `caddy` | Reverse proxy met automatische SSL via Let's Encrypt. |
+| `vaultwarden` | Jouw eigen lokale wachtwoordmanager. |
 
 ### 🏠 Home Automation
 | Rol | Doel |
 | :--- | :--- |
 | `homeassistant` | Het centrale brein van de woning. |
-| `zigbee2mqtt` | Communicatie met Zigbee hardware (incl. Bluetooth ondersteuning). |
+| `zigbee2mqtt` | Communicatie met Zigbee hardware. |
 | `mosquitto` | De MQTT-broker voor alle sensorinformatie. |
 
 ---
 
+## 📊 Automatische Rapportage (Audit)
+Dit project is zelf-documenterend. Na elke run genereert Ansible een professionele PDF-audit in `~/homelab-reports/`:
+* **Security Score:** Gebaseerd op de Lynis Hardening Index.
+* **Hardware Specs:** Actueel CPU, RAM en Disk verbruik.
+* **Service Check:** Overzicht van alle actieve Docker containers.
+
+---
+
+## 🚀 Snel aan de slag
+
+### 1. Voorbereiding (Laptop/PC)
+Installeer de PDF-motor op je eigen machine:
+* **MacOS:** `brew install pango && pip3 install weasyprint`
+* **Windows (WSL2) / Linux:** `sudo apt install python3-weasyprint -y`
+
+### 2. SSH Handdruk & Rechten
+Zorg dat je zonder wachtwoord kunt inloggen op je server:
+```bash
+ssh-keygen -t ed25519
+ssh-copy-id $USER@<server-ip>
+---
+
 ## 📺 Media, YouTube & Websites
 
-### 🐳 Containers & Automatisering
-* **[Sven's Tech Corner (YouTube)](https://www.youtube.com/@SvensTechCorner)** - Uitstekende uitleg over **Docker** en containers. Ideaal voor wie wil begrijpen hoe software 'verpakt' wordt.
-* **[Ansible voor Beginners](https://www.computable.nl/artikel/achtergrond/beheer/6910620/5241036/wat-is-ansible-eigenlijk.html)** - Een heldere introductie in de kracht van automatisering zonder typefouten.
+### 🌿 De Basis: Git & Docker
+* **[Git Crash Course](https://www.youtube.com/watch?v=mAFoROnOfHs)** *Snelcursus om te begrijpen hoe je code beheert en veilig naar GitHub pusht.*
+* **[Docker Roadmap: Beginner to Pro](https://www.youtube.com/watch?v=zFa9_K8BS8I)** *Alles over containers, van je eerste 'hello world' tot complexe omgevingen.*
 
-### 🏠 Home Assistant & Smarthome
-* **[HW-Install (YouTube)](https://www.youtube.com/@HWInstall)** - Dé plek voor diepgaande video's over Home Assistant installaties en hardware-tips.
-* **[Tweakers.net - Home Automation Forum](https://gathering.tweakers.net/forum/list_topics/82)** - De grootste en meest behulpzame Nederlandstalige community voor al je vragen.
-* **[Home Assistant Community (NL sectie)](https://community.home-assistant.io/c/non-english/nederlands-dutch/27)** - Directe hulp van mede-gebruikers in je eigen taal.
-
+### 🤖 Automatisering: Ansible
+* **[Ansible Quick Start Course](https://www.youtube.com/watch?v=p9bda0-TIRc)** *De snelste manier om te begrijpen hoe Playbooks en Roles samenwerken.*
+* **[Ansible Deep Dive - Playlist Deel 1](https://www.youtube.com/playlist?list=PL2_OBreMn7FqZkvMYt6ATmgC0KAGGJNAN)** *Grondige uitleg over de architectuur van Ansible.*
+* **[Ansible Deep Dive - Playlist Deel 2](https://www.youtube.com/playlist?list=PLT98CRl2KxKEUHie1m24-wkyHpEsa4Y70)** *Geavanceerde configuraties voor de echte power-user.*
 
 ---
 
@@ -79,9 +100,17 @@ High-end privacy hoeft niet duur te zijn. Dit project bewijst dat je met:
 
 Vergeet de inventory.yml niet aan te passen met jouw server(s)!
 
-```bash
-git clone https://github.com/henrydenhengst/homelab.git
+git clone [https://github.com/henrydenhengst/homelab.git](https://github.com/henrydenhengst/homelab.git)
 cd homelab
+
+# Setup de omgeving voor jouw gebruiker ($USER)
+chmod +x setup_homelab_audit.sh
+./setup_homelab_audit.sh
+
+# Geheimen configureren
 cp vault.yml.example group_vars/all/vault.yml
 ansible-vault encrypt group_vars/all/vault.yml
-ansible-playbook -i inventory.yml site.yml
+
+# Eerste run (inclusief privilege escalation)
+ansible-playbook -i inventory.ini site.yml --ask-vault-pass --ask-become-pass
+
