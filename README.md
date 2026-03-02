@@ -93,7 +93,6 @@ ssh-copy-id $USER@<server-ip>
 
 Vergeet de inventory.yml niet aan te passen met jouw server(s)!
 
-```bash
 git clone https://github.com/henrydenhengst/homelab.git
 cd homelab
 
