@@ -1,33 +1,12 @@
 ---
-- name: "Remote: Systeemdata verzamelen van server"
-  block:
-    - name: "Lynis Hardening Score uitlezen"
-      ansible.builtin.shell: "grep 'Hardening index' /var/log/lynis-report.dat | cut -d= -f2"
-      register: lynis_raw
-      failed_when: false
-      changed_when: false
-
-    - name: "Lijst met actieve Docker containers ophalen"
-      ansible.builtin.command: "docker ps --format '{% raw %}{{.Names}}{% endraw %}'"
-      register: docker_names
-      changed_when: false
-      ignore_errors: true
-
-- name: "Local: Rapportage bouwen op deze machine ($USER)"
+- name: PDF Genereren op Desktop van gebruiker
+  shell: |
+    "{{ ansible_python_interpreter }}" -m weasyprint /tmp/audit_{{ inventory_hostname.split('.')[0] }}.html ~/Desktop/Audit_{{ inventory_hostname.split('.')[0] }}_{{ ansible_date_time.date }}.pdf
   delegate_to: localhost
-  become: no
-  block:
-    - name: "Zorg dat de rapportagemap bestaat: {{ audit_base_dir }}"
-      ansible.builtin.file:
-        path: "{{ audit_base_dir }}"
-        state: directory
-        mode: '0755'
+  register: pdf_result
+  ignore_errors: yes
 
-    - name: "HTML rapportage voorbereiden"
-      ansible.builtin.template:
-        src: server_report.html.j2
-        dest: "/tmp/audit_{{ inventory_hostname }}.html"
-
-    - name: "PDF Genereren via WeasyPrint"
-      ansible.builtin.shell: "weasyprint /tmp/audit_{{ inventory_hostname }}.html {{ audit_base_dir }}/Audit_{{ inventory_hostname }}_{{ audit_date }}.pdf"
-      ignore_errors: true
+- name: Debug Output
+  debug:
+    msg: "Gebruikte Python: {{ ansible_python_interpreter }}"
+  delegate_to: localhost

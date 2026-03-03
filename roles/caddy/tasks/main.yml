@@ -1,32 +1,32 @@
 ---
-- name: Maak Caddy data mappen aan
+- name: Maak directory voor Caddy mappen
   file:
     path: "{{ item }}"
     state: directory
     mode: '0755'
-  with_items:
-    - /opt/docker/caddy
-    - /opt/docker/caddy/data
-    - /opt/docker/caddy/config
+  loop:
+    - "{{ docker_base_path }}/caddy"
+    - "{{ docker_base_path }}/caddy/data"
+    - "{{ docker_base_path }}/caddy/config"
 
-- name: Kopieer Caddyfile template
+- name: Plaats Caddyfile
   template:
     src: Caddyfile.j2
-    dest: /opt/docker/caddy/Caddyfile
-  notify: Restart Caddy
+    dest: "{{ docker_base_path }}/caddy/Caddyfile"
+    mode: '0644'
 
 - name: Start Caddy container
   docker_container:
     name: caddy
     image: caddy:latest
     state: started
-    restart_policy: always
+    restart_policy: unless-stopped
     networks:
       - name: "{{ docker_network_name }}"
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - /opt/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
-      - /opt/docker/caddy/data:/data
-      - /opt/docker/caddy/config:/config
+      - "{{ docker_base_path }}/caddy/Caddyfile:/etc/caddy/Caddyfile"
+      - "{{ docker_base_path }}/caddy/data:/data"
+      - "{{ docker_base_path }}/caddy/config:/config"

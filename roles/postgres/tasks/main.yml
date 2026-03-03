@@ -1,38 +1,25 @@
 ---
-# Stap 1: Zorg dat de map op de server bestaat waar de database zijn bestanden opslaat.
-# Als de container stopt of wordt verwijderd, blijft je data hier veilig staan.
 - name: Maak directory voor Postgres data
   file:
-    path: /opt/postgres/data
+    path: "{{ docker_base_path }}/postgres/data"
     state: directory
-    owner: "{{ main_user }}"  # Variabele voor de naam
-    group: "{{ main_user }}"  # Variabele voor de groep
-    mode: '0755'               # De rechten blijven keurig staan
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
+    mode: '0755'
 
-# Stap 2: Start de PostgreSQL container.
-# We gebruiken de 'alpine' variant omdat deze lekker lichtgewicht is.
 - name: Start PostgreSQL container
   docker_container:
     name: postgres_db
     image: postgres:16-alpine
     state: started
     restart_policy: unless-stopped
-    # De poort 5432 is de standaard voor Postgres.
+    networks:
+      - name: "{{ docker_network_name }}"
     ports:
       - "5432:5432"
-    # Hier koppelen we de map op de server aan de map binnenin de container.
     volumes:
-      - /opt/postgres/data:/var/lib/postgresql/data
-    # Hier gebruiken we de geheime variabele uit je Vault (group_vars/all/secret.yml).
+      - "{{ docker_base_path }}/postgres/data:/var/lib/postgresql/data"
     env:
       POSTGRES_USER: homeassistant
       POSTGRES_DB: homeassistant
-      POSTGRES_PASSWORD: "{{ db_password }}"
-
-# Stap 3: Een kleine check om te kijken of de database reageert (optioneel maar handig).
-- name: Wacht tot PostgreSQL klaar is voor verbindingen
-  wait_for:
-    port: 5432
-    host: localhost
-    delay: 5
-    timeout: 30
+      POSTGRES_PASSWORD: "{{ vault_postgres_password }}"

@@ -1,25 +1,21 @@
-# Basis configuratie
 default_config:
 
-# REVERSE PROXY FIX (Dit lost de SSL/Protocol error op)
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    - 172.21.0.0/16
     - 127.0.0.1
+    - 172.16.0.0/12
 
-# Recorder instellen voor PostgreSQL
 recorder:
-  db_url: postgresql://{{ vault_postgres_user }}:{{ vault_postgres_password }}@postgres_db/homeassistant
+  db_url: postgresql://homeassistant:{{ vault_postgres_password }}@postgres_db/homeassistant
   purge_keep_days: 30
-  commit_interval: 10
 
-# MQTT Integratie
 mqtt:
   broker: mosquitto
   discovery: true
 
-# URLs instellen
 homeassistant:
-  external_url: "https://ha.{{ duckdns_domain }}.duckdns.org"
+  name: "Henry's Homelab"
+  time_zone: "Europe/Amsterdam"
+  external_url: "https://{{ ha_subdomain }}.{{ domain }}"
   internal_url: "http://homeassistant:8123"

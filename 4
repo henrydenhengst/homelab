@@ -1,0 +1,8 @@
+# 1. Installeer de module specifiek voor de actieve gebruiker
+python3 -m pip install --user --upgrade weasyprint --break-system-packages
+
+# 2. Ververs je shell-sessie direct
+hash -r
+
+# 3. Test de versie opnieuw met het volledige pad naar de module
+python3 -m weasyprint --version

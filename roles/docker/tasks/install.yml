@@ -1,0 +1,18 @@
+---
+- name: Installeer benodigde systeem pakketten
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - python3-pip
+      - python3-docker  # Dit is de officiële vervanger voor 'pip install docker'
+    state: present
+    update_cache: yes
+
+- name: Zorg dat Docker SDK via apt aanwezig is (fallback)
+  apt:
+    name: python3-docker
+    state: present

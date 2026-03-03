@@ -1,3 +1,4 @@
+cat << 'EOF' > ~/git/homelab/roles/portainer/tasks/main.yml
 ---
 - name: Maak Portainer volume directory
   file:
@@ -18,3 +19,4 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - "{{ docker_base_path }}/portainer/data:/data"
+EOF

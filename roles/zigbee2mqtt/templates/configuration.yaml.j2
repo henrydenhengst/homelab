@@ -2,11 +2,12 @@ homeassistant: true
 permit_join: false
 mqtt:
   base_topic: zigbee2mqtt
-  server: 'mqtt://mosquitto' # We gebruiken de containernaam als host
+  server: mqtt://mosquitto:1883
 serial:
-  port: /dev/ttyUSB0
-  adapter: zstack  # Cruciaal voor jouw kloon/CC-chipset
+  port: {{ zigbee_device }}
 frontend:
   port: 8080
 advanced:
   network_key: GENERATE
+  pan_id: GENERATE
+  ext_pan_id: GENERATE

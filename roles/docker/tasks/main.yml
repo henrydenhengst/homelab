@@ -1,45 +1,6 @@
 ---
-- name: Verwijder oude Docker versies (indien aanwezig)
-  apt:
-    name: [docker, docker-engine, docker.io, containerd, runc]
-    state: absent
+- name: Installatie van Docker engine
+  include_tasks: install.yml
 
-- name: Installeer benodigde pakketten
-  apt:
-    name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release, python3-pip, python3-docker]
-    state: present
-    update_cache: yes
-
-- name: Voeg Docker GPG sleutel toe
-  apt_key:
-    url: https://download.docker.com/linux/debian/gpg
-    state: present
-
-- name: Voeg de officiële Docker repository toe
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
-    state: present
-
-- name: Installeer Docker Engine en Docker Compose
-  apt:
-    name: [docker-ce, docker-ce-cli, containerd.io, docker-compose-plugin]
-    state: present
-    update_cache: yes
-
-- name: Zorg dat Docker service draait en start bij boot
-  service:
-    name: docker
-    state: started
-    enabled: yes
-
-- name: Voeg gebruiker toe aan de docker groep
-  user:
-    name: "{{ main_user }}"
-    groups: docker
-    append: yes
-
-# CRUCIAAL: Het netwerk voor al je containers
-- name: Zorg dat het Docker netwerk 't2_network' bestaat
-  docker_network:
-    name: t2_network
-    state: present
+- name: Configuratie van Docker netwerken
+  include_tasks: network.yml

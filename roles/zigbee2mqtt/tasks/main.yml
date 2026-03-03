@@ -1,32 +1,32 @@
 ---
-- name: Maak directory voor Zigbee2MQTT data
+- name: Maak Zigbee2MQTT directory
   file:
     path: "{{ docker_base_path }}/zigbee2mqtt/data"
     state: directory
     mode: '0755'
 
-- name: Plaats Zigbee2MQTT basisconfiguratie
+- name: Plaats Zigbee2MQTT configuratie
   template:
     src: configuration.yaml.j2
     dest: "{{ docker_base_path }}/zigbee2mqtt/data/configuration.yaml"
     mode: '0644'
-    force: no
+    force: yes
+  register: z2m_config
 
 - name: Start Zigbee2MQTT container
   docker_container:
     name: zigbee2mqtt
     image: koenkk/zigbee2mqtt:latest
-    restart_policy: unless-stopped
     state: started
-    # DIT IS DE ONTBREKENDE SCHAKEL:
-    published_ports:
-      - "8080:8080"
+    restart_policy: unless-stopped
+    restart: "{{ z2m_config.changed }}"
+    privileged: true
+    networks:
+      - name: "{{ docker_network_name }}"
     volumes:
       - "{{ docker_base_path }}/zigbee2mqtt/data:/app/data"
       - /run/udev:/run/udev:ro
     devices:
-      - "{{ zigbee_device }}:/dev/ttyUSB0"
+      - "{{ zigbee_device }}:{{ zigbee_device }}"
     env:
-      TZ: "Europe/Amsterdam"
-    networks:
-      - name: t2_network
+      TZ: "{{ timezone }}"

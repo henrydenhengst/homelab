@@ -1,3 +1,8 @@
+#!/bin/bash
+REPO="$HOME/git/homelab/roles"
+
+# Schoonmaak Mosquitto
+cat << 'INNER' > $REPO/mosquitto/tasks/main.yml
 ---
 - name: Maak Mosquitto directories
   file:

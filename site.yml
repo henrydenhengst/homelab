@@ -55,4 +55,4 @@
     # -----------------------------------------------------
     # 6. 📊 De Rapporteur (De Finale)
     # -----------------------------------------------------
-    - role: audit              # Genereert PDF-audit op laptop ($USER)
+    # - role: audit              # Genereert PDF-audit op laptop ($USER)
