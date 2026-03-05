@@ -12,11 +12,11 @@
 
 Dit project is een Infrastructure-as-Code suite die de "standaard" afdwingt op homelab hardware.
 
-**Wie:** Ontwikkeld door voor het beheren van een minimalistische Home Assistant homelab.
-**Wat:** Een verzameling Ansible-rollen die een Linux-server strippen van GUI/ballast en configureren als Docker-host voor o.a. Vaultwarden, Caddy en Home Assistant.
-**Waar:** Ontworpen voor headless Linux-omgevingen (bijv. Intel N100 of oude laptops) binnen het lokale netwerk.
-**Wanneer:** Te gebruiken bij de initiële setup van een server en bij elke configuratiewijziging om de "Gouden Staat" te behouden.
-**Waarom:** Om hardware-resources optimaal te benutten (geen verspilling) en om een reproduceerbare, veilige omgeving te hebben zonder handmatige fouten.
+Ontwikkeld door voor het beheren van een minimalistische Home Assistant homelab.
+Een verzameling Ansible-rollen die een Linux-server strippen van GUI/ballast en configureren als Docker-host voor o.a. Vaultwarden, Caddy en Home Assistant.
+Ontworpen voor headless Linux-omgevingen (bijv. Intel N100 of oude laptops) binnen het lokale netwerk.
+Te gebruiken bij de initiële setup van een server en bij elke configuratiewijziging om de "Gouden Staat" te behouden.
+Om hardware-resources optimaal te benutten (geen verspilling) en om een reproduceerbare, veilige omgeving te hebben zonder handmatige fouten.
 
 ---
 
@@ -141,9 +141,9 @@ Waarom moeilijk doen als het efficiënt kan? Dit project volgt drie kernprincipe
 * **[Ansible Deep Dive - Playlist Deel 2](https://www.youtube.com/playlist?list=PLT98CRl2KxKEUHie1m24-wkyHpEsa4Y70)** *Geavanceerde configuraties voor de echte power-user.*
 
 ### Homelab: Home Assistant
-* **[Home Assistant] (https://www.youtube.com/watch?v=zr48wGUjle8)** *Home Assistant*
-* **[Home Assistant Automation] https://www.youtube.com/watch?v=YN2Gpn1l4nU)** *Automations*
-* **[Home Assistant Dashboard] https://www.youtube.com/watch?v=pC-VBly1Y00)** *Dashboards*
+* **[Home Assistant](https://www.youtube.com/watch?v=zr48wGUjle8)** *Home Assistant*
+* **[Home Assistant Automation](https://www.youtube.com/watch?v=YN2Gpn1l4nU)** *Automations*
+* **[Home Assistant Dashboard](https://www.youtube.com/watch?v=pC-VBly1Y00)** *Dashboards*
 
 ---
 
