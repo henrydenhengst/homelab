@@ -17,11 +17,6 @@ Dit project bevat mijn persoonlijke **Infrastructure as Code (IaC)** suite. Het 
 * **Opslag:** 32GB+ SSD/NVMe (Vermijd SD-kaarten voor database-stabiliteit).
 * **Extra:** Externe USB backup-disk & Zigbee dongle (SkyConnect/Sonoff).
 
-### 💻 Software (Control Node - Jouw Laptop/PC)
-* **OS:** MacOS, Linux of Windows (via **WSL2**).
-* **Python:** 3.10+ (nodig voor de PDF-rapportage engine `weasyprint`).
-* **SSH:** Sleutel-gebaseerde authenticatie is vereist voor automatisering.
-
 ---
 
 ## 🎯 De Filosofie
