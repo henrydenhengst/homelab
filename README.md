@@ -6,8 +6,9 @@
 
 | Categorie | Badges |
 | :--- | :--- |
+| **Logic** | ![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat-square&logo=python&logoColor=white) ![YAML](https://img.shields.io/badge/YAML-Configuration-red?style=flat-square&logo=yaml&logoColor=white) |
 | **Automation** | ![Ansible](https://img.shields.io/badge/Ansible-2.10+-black?style=flat-square&logo=ansible) ![Vault](https://img.shields.io/badge/Ansible_Vault-Encrypted-yellow?style=flat-square&logo=ansible) |
-| **Infra** | ![Docker](https://img.shields.io/badge/Docker-CE-blue?style=flat-square&logo=docker) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue?style=flat-square&logo=postgresql) |
+| **Infra** | ![Docker](https://img.shields.io/badge/Docker-CE-2496ED?style=flat-square&logo=docker&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-4169E1?style=flat-square&logo=postgresql&logoColor=white) |
 | **Security** | ![Lynis](https://img.shields.io/badge/Lynis_Index-66%2F100-orange?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square) |
 | **Health** | ![Build](https://img.shields.io/badge/Build-passing-brightgreen?style=flat-square) ![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=flat-square) |
 
