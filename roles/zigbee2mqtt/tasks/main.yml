@@ -3,6 +3,8 @@
   file:
     path: "{{ docker_base_path }}/zigbee2mqtt/data"
     state: directory
+    owner: "1000"
+    group: "1000"
     mode: '0755'
 
 - name: Plaats Zigbee2MQTT configuratie
@@ -10,23 +12,25 @@
     src: configuration.yaml.j2
     dest: "{{ docker_base_path }}/zigbee2mqtt/data/configuration.yaml"
     mode: '0644'
-    force: yes
-  register: z2m_config
 
-- name: Start Zigbee2MQTT container
+- name: VERWIJDER OUDE ZIGBEE (Forceer schone lei)
+  docker_container:
+    name: zigbee2mqtt
+    state: absent
+
+- name: START ZIGBEE2MQTT
   docker_container:
     name: zigbee2mqtt
     image: koenkk/zigbee2mqtt:latest
     state: started
-    restart_policy: unless-stopped
-    restart: "{{ z2m_config.changed }}"
+    restart_policy: always
     privileged: true
     networks:
-      - name: "{{ docker_network_name }}"
+      - name: "t2_network"
     volumes:
       - "{{ docker_base_path }}/zigbee2mqtt/data:/app/data"
       - /run/udev:/run/udev:ro
     devices:
-      - "{{ zigbee_device }}:{{ zigbee_device }}"
+      - "{{ zigbee_device }}:/dev/ttyUSB0"
     env:
       TZ: "{{ timezone }}"

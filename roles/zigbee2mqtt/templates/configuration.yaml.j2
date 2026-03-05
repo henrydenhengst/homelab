@@ -1,13 +1,16 @@
 homeassistant: true
-permit_join: false
+permit_join: true
 mqtt:
   base_topic: zigbee2mqtt
   server: mqtt://mosquitto:1883
 serial:
-  port: {{ zigbee_device }}
+  port: /dev/ttyUSB0
+  adapter: zstack
 frontend:
   port: 8080
+  host: 0.0.0.0
 advanced:
-  network_key: GENERATE
-  pan_id: GENERATE
-  ext_pan_id: GENERATE
+  # Deze sleutel komt uit je foutmelding logs:
+  network_key: [0x01, 0x03, 0x05, 0x07, 0x09, 0x0b, 0x0d, 0x0f, 0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0d]
+  pan_id: 6754
+  ext_pan_id: [0xDD, 0x33, 0xFE, 0xCA, 0xBA, 0xBE, 0xEF, 0x01]

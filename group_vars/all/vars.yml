@@ -1,11 +1,7 @@
----
 docker_base_path: "/opt/docker"
 docker_network_name: "t2_network"
 domain: "duckdns.org"
-acme_email: "henrydenhengst@gmail.com"
-
-flame_subdomain: "denhengst"
-ha_subdomain: "ha"
+timezone: "Europe/Amsterdam"
 zigbee_subdomain: "zigbee"
-esphome_subdomain: "esphome"
+ha_subdomain: "homeassistant"
 portainer_subdomain: "portainer"

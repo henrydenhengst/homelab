@@ -1,6 +1,0 @@
----
-# De plek waar je PDF's verschijnen op je laptop/pc
-audit_base_dir: "{{ lookup('env','HOME') }}/homelab-reports"
-audit_owner: "henry"
-# Bestandsnaam timestamp: jjjj-mm-dd_uumi
-audit_date: "{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"

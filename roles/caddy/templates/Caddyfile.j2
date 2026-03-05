@@ -1,19 +1,15 @@
-{
-    email {{ acme_email }}
-}
-
-{{ ha_subdomain }}.{{ domain }} {
-    reverse_proxy homeassistant:8123
-}
-
-{{ flame_subdomain }}.{{ domain }} {
+{{ duckdns_domain }}.{{ domain }} {
     reverse_proxy flame:5005
 }
 
-{{ portainer_subdomain }}.{{ domain }} {
-    reverse_proxy portainer:9000
+{{ zigbee_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    reverse_proxy zigbee2mqtt:8080
 }
 
-{{ esphome_subdomain }}.{{ domain }} {
-    reverse_proxy 172.17.0.1:6052
+{{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    reverse_proxy homeassistant:8123
+}
+
+{{ portainer_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    reverse_proxy portainer:9000
 }
