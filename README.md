@@ -3,7 +3,11 @@
 > Korte beschrijving van wat dit project doet.
 
 ![Ansible](https://img.shields.io/badge/Ansible-2.10+-black.svg?style=for-the-badge&logo=ansible)
+![Ansible Vault](https://img.shields.io/badge/Ansible_Vault-Encrypted-yellow?style=for-the-badge&logo=ansible-lock&logoColor=black)
 ![Docker](https://img.shields.io/badge/Docker-CE-blue.svg?style=for-the-badge&logo=docker)
+![YAML](https://img.shields.io/badge/YAML-Config-CB171E?style=for-the-badge&logo=yaml&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
 ![Version](https://img.shields.io/badge/version-1.0.0-orange)
