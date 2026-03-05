@@ -1,4 +1,4 @@
-# 🚀 Home Assistant Homelab
+# 🚀 Henry's Lean & Mean Home Assistant Homelab
 
 > Korte beschrijving van wat dit project doet.
 
@@ -10,13 +10,13 @@
 
 ## 📖 Over het project
 
-Dit project is een Infrastructure-as-Code suite.
+Dit project is een Infrastructure-as-Code suite die de "Henry-standaard" afdwingt op homelab hardware.
 
-Ontwikkeld door voor het beheren van een minimalistische Home Assistant homelab.
-Een verzameling Ansible-rollen die een Linux-server strippen van GUI/ballast en configureren als Docker-host voor o.a. Vaultwarden, Caddy en Home Assistant.
-Ontworpen voor headless Linux-omgevingen (bijv. Intel N100 of oude laptops) binnen het lokale netwerk.
-Te gebruiken bij de initiële setup van een server en bij elke configuratiewijziging om de "Gouden Staat" te behouden.
-Om hardware-resources optimaal te benutten (geen verspilling) en om een reproduceerbare, veilige omgeving te hebben zonder handmatige fouten.
+**Wie:** Ontwikkeld door voor het beheren van een minimalistische Home Assistant homelab.
+**Wat:** Een verzameling Ansible-rollen die een Linux-server strippen van GUI/ballast en configureren als Docker-host voor o.a. Vaultwarden, Caddy en Home Assistant.
+**Waar:** Ontworpen voor headless Linux-omgevingen (bijv. Intel N100 of oude laptops) binnen het lokale netwerk.
+**Wanneer:** Te gebruiken bij de initiële setup van een server en bij elke configuratiewijziging om de "Gouden Staat" te behouden.
+**Waarom:** Om hardware-resources optimaal te benutten (geen verspilling) en om een reproduceerbare, veilige omgeving te hebben zonder handmatige fouten.
 
 ---
 
@@ -141,9 +141,9 @@ Waarom moeilijk doen als het efficiënt kan? Dit project volgt drie kernprincipe
 * **[Ansible Deep Dive - Playlist Deel 2](https://www.youtube.com/playlist?list=PLT98CRl2KxKEUHie1m24-wkyHpEsa4Y70)** *Geavanceerde configuraties voor de echte power-user.*
 
 ### Homelab: Home Assistant
-* **[Home Assistant] (https://www.youtube.com/watch?v=zr48wGUjle8)**
-* **[Home Assistant Automation] https://www.youtube.com/watch?v=YN2Gpn1l4nU)**
-* **[Home Assistant Dashboard] https://www.youtube.com/watch?v=pC-VBly1Y00)**
+* **[Home Assistant] (https://www.youtube.com/watch?v=zr48wGUjle8)** *Home Assistant*
+* **[Home Assistant Automation] https://www.youtube.com/watch?v=YN2Gpn1l4nU)** *Automations*
+* **[Home Assistant Dashboard] https://www.youtube.com/watch?v=pC-VBly1Y00)** *Dashboards*
 
 ---
 
@@ -163,6 +163,38 @@ git checkout -b feature/my-feature
 
 ---
 
+## ⚠️ Mogelijke Problemen (Pijnpunten)
+
+Bij het draaien van een geautomatiseerd homelab op wisselende hardware kunnen de volgende obstakels optreden:
+
+* **Hardware-Inconsistentie:** Verschillende namen voor netwerkinterfaces (`eno1` vs `eth0`) en variabele USB-paden voor Zigbee/Matter dongles.
+* **Netwerkbeperkingen (CGNAT):** Providers die poort-forwarding blokkeren, waardoor de standaard HTTP-challenge voor SSL-certificaten (Caddy) faalt.
+* **Architectuur-conflicten (CPU):** Docker-images die geoptimaliseerd zijn voor x86_64 (Intel) draaien niet op ARM (Raspberry Pi), wat leidt tot `exec format` fouten.
+* **Opslag-fouten:** Onjuiste mount-points voor externe schijven, waardoor databases niet starten of de systeem-schijf onbedoeld volloopt.
+* **Configuratie-drift:** Handmatige aanpassingen op de server die niet in de Ansible-code staan, wat leidt tot onvoorspelbaar gedrag bij een herinstallatie.
+
+---
+
+## 🗺️ Roadmap: De Weg naar de Standaard 2.0
+
+Dit plan adresseert de bovenstaande problemen om de stack volledig hardware-agnostisch en robuust te maken.
+
+### 📍 Fase 1: Slimme Hardware Discovery (Korte termijn)
+- [ ] **Pre-flight Rol:** Ontwikkelen van een Ansible-taak die hardware (CPU-type, netwerk-ID, USB-sticks) scant vóór de installatie.
+- [ ] **Persistente USB-Paden:** Volledige overstap van `/dev/ttyUSBx` naar het unieke `/dev/serial/by-id/` pad voor alle hardware-dongles.
+
+### 📍 Fase 2: Netwerk & SSL Robuustheid
+- [ ] **DNS-01 Challenge:** Caddy configureren voor SSL-validatie via DNS-records (DuckDNS API) om CGNAT-beperkingen volledig te omzeilen.
+- [ ] **Health-Monitoring:** Implementeren van een centraal dashboard (Portainer/Uptime Kuma) voor real-time status van alle containers.
+
+### 📍 Fase 3: Failover & Backup Strategie
+- [ ] **Automated Off-site Backups:** Volledige integratie van de `rclone` rol met versleutelde uploads naar cloud-opslag.
+- [ ] **Git-based Rollbacks:** Gebruik maken van Git-tags om configuraties snel terug te draaien naar een bewezen "Gouden Staat".
+
+### 📍 Fase 4: Multi-Architectuur Support
+- [ ] **Universal Stack:** Verifiëren en labelen van alle rollen voor zowel Intel/AMD als ARM-hardware, zodat de suite overal draait.
+
+
 ## 📝 License
 
 Dit project valt onder de MIT License.
@@ -176,11 +208,16 @@ Zie `LICENSE` voor meer informatie.
 Naam – @henrydenhengst
 
 Project Link:
-https://github.com/henrydenhengst/homelab
+https://github.com/henrydenhengst/homeassistant
 
 ---
 
 ## ⭐ Support
 
 Vind je dit project handig? Geef het een ⭐ op GitHub!
+
+
+
+
+
 
