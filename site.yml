@@ -33,3 +33,9 @@
     # 6. 📂 Backups
     - role: rsync
     - role: rclone
+
+
+  tasks:
+    - name: "🔍 Voer de finale Systeem Healthcheck uit"
+      ansible.builtin.include_tasks: roles/common/tasks/healthcheck.yml
+      tags: [healthcheck, install]
