@@ -1,4 +1,4 @@
-# 🚀 Henry's Lean & Mean Home Assistant Homelab
+# 🚀 Home Assistant Homelab
 
 > Korte beschrijving van wat dit project doet.
 
@@ -10,13 +10,13 @@
 
 ## 📖 Over het project
 
-Dit project is een Infrastructure-as-Code suite die de "Henry-standaard" afdwingt op homelab hardware.
+Dit project is een Infrastructure-as-Code suite.
 
-**Wie:** Ontwikkeld door voor het beheren van een minimalistische Home Assistant homelab.
-**Wat:** Een verzameling Ansible-rollen die een Linux-server strippen van GUI/ballast en configureren als Docker-host voor o.a. Vaultwarden, Caddy en Home Assistant.
-**Waar:** Ontworpen voor headless Linux-omgevingen (bijv. Intel N100 of oude laptops) binnen het lokale netwerk.
-**Wanneer:** Te gebruiken bij de initiële setup van een server en bij elke configuratiewijziging om de "Gouden Staat" te behouden.
-**Waarom:** Om hardware-resources optimaal te benutten (geen verspilling) en om een reproduceerbare, veilige omgeving te hebben zonder handmatige fouten.
+Ontwikkeld door voor het beheren van een minimalistische Home Assistant homelab.
+Een verzameling Ansible-rollen die een Linux-server strippen van GUI/ballast en configureren als Docker-host voor o.a. Vaultwarden, Caddy en Home Assistant.
+Ontworpen voor headless Linux-omgevingen (bijv. Intel N100 of oude laptops) binnen het lokale netwerk.
+Te gebruiken bij de initiële setup van een server en bij elke configuratiewijziging om de "Gouden Staat" te behouden.
+Om hardware-resources optimaal te benutten (geen verspilling) en om een reproduceerbare, veilige omgeving te hebben zonder handmatige fouten.
 
 ---
 
@@ -176,16 +176,11 @@ Zie `LICENSE` voor meer informatie.
 Naam – @henrydenhengst
 
 Project Link:
-https://github.com/henrydenhengst/homeassistant
+https://github.com/henrydenhengst/homelab
 
 ---
 
 ## ⭐ Support
 
 Vind je dit project handig? Geef het een ⭐ op GitHub!
-
-
-
-
-
 
