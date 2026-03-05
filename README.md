@@ -113,6 +113,17 @@ ansible-playbook site.yml --check --ask-vault-pass
 ansible all -m ping
 ```
 
+### 🩺 Automated Healthcheck
+Na elke run voer ik een automatische controle uit op de vitale functies van het systeem:
+- **Container Check:** Zijn Home Assistant, MQTT en Postgres stabiel?
+- **Port Check:** Staan de noodzakelijke poorten open voor data-verkeer?
+- **Disk Check:** Is er nog voldoende ruimte op de SSD (voor database logs)?
+
+Uitvoeren via:
+```bash
+ansible-playbook site.yml --tags healthcheck
+```
+
 ---
 
 

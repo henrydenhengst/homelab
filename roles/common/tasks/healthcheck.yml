@@ -1,0 +1,31 @@
+---
+- name: "🚀 Henry's System Healthcheck"
+  block:
+    - name: Controleer of kritieke Docker containers up-and-running zijn
+      community.docker.docker_container_info:
+        name: "{{ item }}"
+      register: container_status
+      loop:
+        - homeassistant
+        - mosquitto
+        - zigbee2mqtt
+        - postgres
+        - caddy
+      failed_when: not container_status.exists or not container_status.container.State.Running
+
+    - name: Test netwerk connectiviteit naar de Database (Postgres)
+      ansible.builtin.wait_for:
+        host: localhost
+        port: 5432
+        timeout: 5
+        msg: "⚠️ Postgres is niet bereikbaar op poort 5432!"
+
+    - name: Controleer schijfruimte (Voorkom ballast op de SSD)
+      ansible.builtin.shell: df -h / | awk 'NR==2 {print $5}' | sed 's/%//'
+      register: disk_usage
+      failed_when: disk_usage.stdout | int > 90
+      changed_when: false
+
+    - name: 🏁 Status Rapport
+      ansible.builtin.debug:
+        msg: "Systeem is 'Lean & Mean'! Containers draaien en schijfgebruik is {{ disk_usage.stdout }}%."
