@@ -14,6 +14,11 @@
 
 ## 📖 Over het project
 
+Geen handmatige UI-configuraties of 'magic fixes'. We gebruiken **Infrastructure as Code** om:
+1.  Binnen 10 minuten een volledige smart-home server op te tuigen.
+2.  Hardware-conflicten (USB-poort wisselingen) te elimineren.
+3.  Security-hardening (Lynis) standaard mee te leveren.
+
 Dit project is een Infrastructure-as-Code suite die de "standaard" afdwingt op homelab hardware.
 
 Ontwikkeld door voor het beheren van een minimalistische Home Assistant homelab.
@@ -175,6 +180,16 @@ git checkout -b feature/my-feature
 
 3. Commit je wijzigingen
 4. Open een Pull Request
+
+
+### 🤝 Meewerken? (Testers & Devs Gezocht!)
+Ik zoek specifiek naar Nederlandse techneuten die willen helpen dit systeem robuuster te maken. 
+
+**Hoe kun je helpen?**
+* **Testers:** Valideer de hardware-mapping op jouw specifieke dongles.
+* **Developers:** Help mee met de backup-automatisering en security-hardening.
+
+👉 **Bekijk de actuele taken hier:** [GitHub Issues](https://github.com/henrydenhengst/homelab/issues)
 
 ---
 
