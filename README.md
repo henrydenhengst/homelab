@@ -1,6 +1,6 @@
 # 🚀 Home Assistant Homelab
 
-> Korte beschrijving van wat dit project doet.
+> Dit project is een Infrastructure-as-Code suite die een Linux-server volledig stript van ballast en inricht als een geoptimaliseerde, headless Docker-host voor o.a. Home Assistant en Vaultwarden.
 
 ![Ansible](https://img.shields.io/badge/Ansible-2.10+-black.svg?style=for-the-badge&logo=ansible)
 ![Ansible Vault](https://img.shields.io/badge/Ansible_Vault-Encrypted-yellow?style=for-the-badge&logo=ansible-lock&logoColor=black)
