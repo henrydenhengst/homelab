@@ -1,3 +1,5 @@
-[all]
+[homeserver]
 server ansible_host=192.168.178.2 ansible_user=henry
-localhost ansible_connection=local ansible_python_interpreter="{{ ansible_playbook_python }}"
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
