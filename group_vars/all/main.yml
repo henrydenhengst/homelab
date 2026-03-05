@@ -1,0 +1,2 @@
+docker_network_name: "t2_network"
+postgres_container_name: "postgres_db" # Zorg dat deze naam overal terugkomt

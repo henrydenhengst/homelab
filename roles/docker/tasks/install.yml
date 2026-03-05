@@ -1,18 +1,37 @@
 ---
-- name: Installeer benodigde systeem pakketten
-  apt:
+- name: "📦 Installeer systeem-afhankelijkheden"
+  ansible.builtin.apt:
     name:
       - apt-transport-https
       - ca-certificates
       - curl
       - gnupg
       - lsb-release
-      - python3-pip
-      - python3-docker  # Dit is de officiële vervanger voor 'pip install docker'
+      - python3-docker
     state: present
     update_cache: yes
 
-- name: Zorg dat Docker SDK via apt aanwezig is (fallback)
-  apt:
-    name: python3-docker
+- name: "🔑 Voeg Docker GPG-sleutel toe"
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/debian/gpg
     state: present
+
+- name: "📂 Voeg officiële Docker Repository toe"
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    state: present
+
+- name: "🐳 Installeer Docker Engine (Nieuwste Versie)"
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
+    update_cache: yes
+
+- name: "🔄 Zorg dat Docker service draait en start bij boot"
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes

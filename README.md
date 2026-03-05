@@ -2,16 +2,14 @@
 
 > Dit project is een Infrastructure-as-Code suite die een Linux-server volledig stript van ballast en inricht als een geoptimaliseerde, headless Docker-host voor o.a. Home Assistant en Vaultwarden.
 
-![Ansible](https://img.shields.io/badge/Ansible-2.10+-black.svg?style=for-the-badge&logo=ansible)
-![Ansible Vault](https://img.shields.io/badge/Ansible_Vault-Encrypted-yellow?style=for-the-badge&logo=ansible-lock&logoColor=black)
-![Docker](https://img.shields.io/badge/Docker-CE-blue.svg?style=for-the-badge&logo=docker)
-![YAML](https://img.shields.io/badge/YAML-Config-CB171E?style=for-the-badge&logo=yaml&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791?style=for-the-badge&logo=postgresql&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Lynis Score](https://img.shields.io/badge/Lynis_Hardening_Index-66/100-orange?style=for-the-badge&logo=lynis&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Build](https://img.shields.io/badge/build-passing-brightgreen)
-![Version](https://img.shields.io/badge/version-1.0.0-orange)
+### 🛠️ Tech Stack & Status
+
+| Categorie | Badges |
+| :--- | :--- |
+| **Automation** | ![Ansible](https://img.shields.io/badge/Ansible-2.10+-black?style=flat-square&logo=ansible) ![Vault](https://img.shields.io/badge/Ansible_Vault-Encrypted-yellow?style=flat-square&logo=ansible) |
+| **Infra** | ![Docker](https://img.shields.io/badge/Docker-CE-blue?style=flat-square&logo=docker) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue?style=flat-square&logo=postgresql) |
+| **Security** | ![Lynis](https://img.shields.io/badge/Lynis_Index-66%2F100-orange?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square) |
+| **Health** | ![Build](https://img.shields.io/badge/Build-passing-brightgreen?style=flat-square) ![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=flat-square) |
 
 ## 📖 Over het project
 

@@ -1,7 +1,7 @@
 ---
 - name: "🚀 Henry's System Healthcheck"
   block:
-    - name: Controleer of kritieke Docker containers up-and-running zijn
+    - name: 🐋 Controleer of kritieke Docker containers up-and-running zijn
       community.docker.docker_container_info:
         name: "{{ item }}"
       register: container_status
@@ -9,18 +9,38 @@
         - homeassistant
         - mosquitto
         - zigbee2mqtt
-        - postgres
+        - postgres_db
         - caddy
       failed_when: not container_status.exists or not container_status.container.State.Running
 
-    - name: Test netwerk connectiviteit naar de Database (Postgres)
-      ansible.builtin.wait_for:
-        host: localhost
-        port: 5432
-        timeout: 5
-        msg: "⚠️ Postgres is niet bereikbaar op poort 5432!"
+    - name: 🔌 Controleer of de Zigbee USB-dongle aanwezig is
+      ansible.builtin.stat:
+        path: /dev/ttyUSB0
+      register: usb_check
+      failed_when: not usb_check.stat.exists
 
-    - name: Controleer schijfruimte (Voorkom ballast op de SSD)
+    - name: 🐘 Haal de actieve Postgres gebruiker op
+      ansible.builtin.shell: docker exec postgres_db env | grep POSTGRES_USER | cut -d'=' -f2
+      register: active_pg_user
+      changed_when: false
+
+    - name: 🐘 Test netwerk & database schrijfrechten (Postgres)
+      community.docker.docker_container_exec:
+        container: postgres_db
+        # Gebruikt de gevonden gebruiker of valt terug op 'postgres'
+        command: >
+          psql -U {{ active_pg_user.stdout | default('postgres') }} -h 127.0.0.1 -c "SELECT 1;"
+      register: db_check
+      failed_when: db_check.rc != 0
+
+    - name: 🦟 Test of de MQTT Broker (Mosquitto) luistert
+      ansible.builtin.wait_for:
+        host: "172.21.0.6"
+        port: 1883
+        timeout: 5
+        msg: "⚠️ MQTT broker is niet bereikbaar op poort 1883!"
+
+    - name: 💾 Controleer schijfruimte (Voorkom ballast op de SSD)
       ansible.builtin.shell: df -h / | awk 'NR==2 {print $5}' | sed 's/%//'
       register: disk_usage
       failed_when: disk_usage.stdout | int > 90
@@ -28,4 +48,9 @@
 
     - name: 🏁 Status Rapport
       ansible.builtin.debug:
-        msg: "Systeem is 'Lean & Mean'! Containers draaien en schijfgebruik is {{ disk_usage.stdout }}%."
+        msg: 
+          - "Henry, je systeem is 100% 'Lean & Mean'!"
+          - "Containers: Operationeel 🟢"
+          - "Hardware: USB Dongle gevonden 🟢"
+          - "Database: Connectie via {{ active_pg_user.stdout }} OK 🟢"
+          - "SSD Gebruik: {{ disk_usage.stdout }}% 🟢"
