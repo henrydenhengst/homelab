@@ -1,11 +1,3 @@
-# =====================================================
-# HOMELAB PROJECT - GITIGNORE (VERSIE HENRY - FINAL 2026)
-# =====================================================
-
-# -----------------------------------------------------
-# 🐳 DOCKER PERSISTENT DATA (IGNORE)
-# Voorkom dat lokale test-data of database-dumps in Git komen.
-# -----------------------------------------------------
 /caddy/
 /crowdsec/
 /duckdns/
@@ -23,63 +15,11 @@
 /zwavejsui/
 /rclone/
 /rsync/
-
-# -----------------------------------------------------
-# 🔐 SECRETS & ANSIBLE (SENSITIVE - RECURSIVE SAFE)
-# De **/ zorgt dat deze ook in /inventory/group_vars/ worden genegeerd.
-# -----------------------------------------------------
 **/vault.yml
-**/secrets.yml
-vault.yml
-vars/secrets.yml
-*.secret
-*.key
-*.pem
-*.crt
-.env
+**/secret.yml
 .vault_pass*
-vault_pass.txt
-*.retry
-ansible_debug.log
-
-# -----------------------------------------------------
-# 📊 AUDIT & RAPPORTAGE (PRIVACY)
-# -----------------------------------------------------
-homelab-reports/
-enterprise-audit-reports/
-*.pdf
-*.html
-/tmp/audit_*.html
-
-# -----------------------------------------------------
-# 📂 BACKUPS, CLOUD & LOGS
-# Cruciaal voor je rsync/rclone plannen van de volgende keer.
-# -----------------------------------------------------
-/backups/
-/rclone_config/
-/rsync_logs/
 rclone.conf
 *.log
-*.bak
-*.tmp
 *.db
-
-# -----------------------------------------------------
-# 💻 SYSTEM & IDE
-# -----------------------------------------------------
 .DS_Store
-Thumbs.db
 .vscode/
-.idea/
-__pycache__/
-*.pyc
-.venv/
-
-# -----------------------------------------------------
-# ✅ WHITELIST (WAT MOET WEL IN GIT?)
-# Je Ansible code, rollen en de nieuwe inventory structuur.
-# -----------------------------------------------------
-# /roles/
-# /inventory/
-# site.yml
-# ansible.cfg

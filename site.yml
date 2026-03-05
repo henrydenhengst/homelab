@@ -5,6 +5,7 @@
   gather_facts: yes
 
   roles:
+    - role: vaultwarden
     # 1. 🏗️ De Fundering (OS & Docker)
     - role: common
     - role: security

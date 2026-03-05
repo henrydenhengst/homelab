@@ -1,0 +1,23 @@
+---
+- name: Maak Vaultwarden data directory
+  file:
+    path: "{{ docker_base_path }}/vaultwarden"
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+
+- name: Start Vaultwarden container
+  docker_container:
+    name: vaultwarden
+    image: vaultwarden/server:latest
+    state: started
+    restart_policy: always
+    networks:
+      - name: t2_network
+    volumes:
+      - "{{ docker_base_path }}/vaultwarden:/data"
+    env:
+      SIGNUPS_ALLOWED: "true"
+      DOMAIN: "https://vault.{{ duckdns_domain }}.{{ domain }}"
+      ADMIN_TOKEN: "{{ vaultwarden_admin_token }}"
