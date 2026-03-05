@@ -1,5 +1,8 @@
 {{ duckdns_domain }}.{{ domain }} {
-    reverse_proxy flame:5005
+    reverse_proxy flame:5005 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+    }
 }
 
 {{ zigbee_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
@@ -8,8 +11,4 @@
 
 {{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     reverse_proxy homeassistant:8123
-}
-
-{{ portainer_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
-    reverse_proxy portainer:9000
 }

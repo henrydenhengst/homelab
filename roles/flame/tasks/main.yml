@@ -73,7 +73,6 @@
     # HIER GEBEURT DE MAGIE:
     networks:
       - name: "t2_network"
-    purge_networks: yes
     volumes:
       - "{{ docker_base_path }}/flame/data:/app/data"
     published_ports:

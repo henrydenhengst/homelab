@@ -22,7 +22,7 @@
   when: headless_packages | length > 0
 
 # 3️⃣ Specifieke Debian opschoning
-- name: "Schoon restanten op (Alleen Debian)"
+- name: "Schoon APT restanten op"
   apt:
     autoremove: yes
     purge: yes
