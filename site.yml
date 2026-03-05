@@ -5,20 +5,19 @@
   gather_facts: yes
 
   roles:
-    - role: vaultwarden
-    # 1. 🏗️ De Fundering (OS & Docker)
+    # 1. 🏗️ De Fundering (Eerst Docker, dan de rest)
     - role: common
     - role: security
     - role: fail2ban
     - role: docker
-    
-    # 2. 🛡️ De Poortwachter (Nu naar voren gehaald!)
-    # Zodra de proxy draait, zijn de volgende apps direct 'live'
+
+    # 2. 🛡️ De Poortwachter
     - role: duckdns
     - role: caddy
     - role: portainer
 
-    # 3. 💾 Data & Communicatie
+    # 3. 🔐 Applicaties & Data
+    - role: vaultwarden
     - role: postgres
     - role: mosquitto
 
@@ -31,6 +30,6 @@
     - role: esphome
     - role: flame
 
-    # 6. 📂 Backups (Als laatste, mag mislukken zonder de rest te storen)
+    # 6. 📂 Backups
     - role: rsync
     - role: rclone

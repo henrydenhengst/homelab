@@ -1,23 +1,26 @@
 ---
+- name: Zorg dat het Docker netwerk bestaat
+  community.docker.docker_network:
+    name: "{{ docker_network_name }}"
+    state: present
+
 - name: Maak Vaultwarden data directory
   file:
-    path: "{{ docker_base_path }}/vaultwarden"
+    path: "/home/{{ main_user }}/vaultwarden"
     state: directory
-    owner: "1000"
-    group: "1000"
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
     mode: '0755'
 
 - name: Start Vaultwarden container
-  docker_container:
+  community.docker.docker_container:
     name: vaultwarden
     image: vaultwarden/server:latest
-    state: started
     restart_policy: always
     networks:
-      - name: t2_network
+      - name: "{{ docker_network_name }}"
     volumes:
-      - "{{ docker_base_path }}/vaultwarden:/data"
+      - "/home/{{ main_user }}/vaultwarden:/data"
     env:
-      SIGNUPS_ALLOWED: "true"
-      DOMAIN: "https://vault.{{ duckdns_domain }}.{{ domain }}"
       ADMIN_TOKEN: "{{ vaultwarden_admin_token }}"
+      DOMAIN: "https://vault.{{ duckdns_domain }}.{{ domain }}"
