@@ -1,10 +1,10 @@
 # =====================================================
-# HOMELAB PROJECT - GITIGNORE (VERSIE HENRY)
+# HOMELAB PROJECT - GITIGNORE (VERSIE HENRY - FINAL 2026)
 # =====================================================
 
 # -----------------------------------------------------
 # 🐳 DOCKER PERSISTENT DATA (IGNORE)
-# Deze mappen bevatten databases en configs die op de server horen.
+# Voorkom dat lokale test-data of database-dumps in Git komen.
 # -----------------------------------------------------
 /caddy/
 /crowdsec/
@@ -25,17 +25,19 @@
 /rsync/
 
 # -----------------------------------------------------
-# 🔐 SECRETS & ANSIBLE (SENSITIVE)
+# 🔐 SECRETS & ANSIBLE (SENSITIVE - RECURSIVE SAFE)
+# De **/ zorgt dat deze ook in /inventory/group_vars/ worden genegeerd.
 # -----------------------------------------------------
+**/vault.yml
+**/secrets.yml
 vault.yml
-group_vars/vault.yml
 vars/secrets.yml
 *.secret
 *.key
 *.pem
 *.crt
 .env
-.vault_pass
+.vault_pass*
 vault_pass.txt
 *.retry
 ansible_debug.log
@@ -50,14 +52,17 @@ enterprise-audit-reports/
 /tmp/audit_*.html
 
 # -----------------------------------------------------
-# 📂 BACKUPS & LOGS
+# 📂 BACKUPS, CLOUD & LOGS
+# Cruciaal voor je rsync/rclone plannen van de volgende keer.
 # -----------------------------------------------------
 /backups/
 /rclone_config/
 /rsync_logs/
+rclone.conf
 *.log
 *.bak
 *.tmp
+*.db
 
 # -----------------------------------------------------
 # 💻 SYSTEM & IDE
@@ -71,7 +76,10 @@ __pycache__/
 .venv/
 
 # -----------------------------------------------------
-# ✅ WAT BLIJFT ER WEL IN GIT? (Niet negeren)
-# De volgende mappen bevatten je Ansible-code:
-# common, docker, fail2ban, hardware_discovery, security
+# ✅ WHITELIST (WAT MOET WEL IN GIT?)
+# Je Ansible code, rollen en de nieuwe inventory structuur.
 # -----------------------------------------------------
+# /roles/
+# /inventory/
+# site.yml
+# ansible.cfg
