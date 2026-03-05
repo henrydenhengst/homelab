@@ -1,4 +1,4 @@
-# 🚀 Henry's Lean & Mean Home Assistant Homelab
+# 🚀 Home Assistant Homelab
 
 > Korte beschrijving van wat dit project doet.
 
@@ -10,7 +10,7 @@
 
 ## 📖 Over het project
 
-Dit project is een Infrastructure-as-Code suite die de "Henry-standaard" afdwingt op homelab hardware.
+Dit project is een Infrastructure-as-Code suite die de "standaard" afdwingt op homelab hardware.
 
 **Wie:** Ontwikkeld door voor het beheren van een minimalistische Home Assistant homelab.
 **Wat:** Een verzameling Ansible-rollen die een Linux-server strippen van GUI/ballast en configureren als Docker-host voor o.a. Vaultwarden, Caddy en Home Assistant.
@@ -124,7 +124,7 @@ ansible all -m ping
 ## 🎯 De Filosofie
 Waarom moeilijk doen als het efficiënt kan? Dit project volgt drie kernprincipes:
 1. **Headless by Default:** Geen schermen, geen verspilde RAM. Alles via SSH en Web-UI.
-2. **OS-Agnostisch:** Of je nu **Debian**, **Arch** of **RedHat** draait; de "Henry-standaard" wordt overal afgedwongen.
+2. **OS-Agnostisch:** Of je nu **Debian**, **Arch** of **RedHat** draait; de "standaard" wordt overal afgedwongen.
 3. **Idempotentie:** Je kunt het playbook op elk moment draaien om je systeem terug te brengen naar de perfecte staat.
 
 ---
