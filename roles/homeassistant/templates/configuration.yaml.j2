@@ -4,9 +4,10 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
-    - 172.16.0.0/12
+    - 172.16.0.0/12  # Dit dekt de meeste Docker netwerken
 
 recorder:
+  # Hostnaam aangepast van 'postgres' naar 'postgres_db'
   db_url: postgresql://homeassistant:{{ vault_postgres_password }}@postgres_db/homeassistant
   purge_keep_days: 30
 
@@ -17,5 +18,6 @@ mqtt:
 homeassistant:
   name: "Henry's Homelab"
   time_zone: "Europe/Amsterdam"
-  external_url: "https://{{ ha_subdomain }}.{{ domain }}"
+  # Volledige URL incl. jouw DuckDNS naam:
+  external_url: "https://{{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }}"
   internal_url: "http://homeassistant:8123"

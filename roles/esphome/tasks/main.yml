@@ -11,8 +11,10 @@
     image: ghcr.io/esphome/esphome:latest
     restart_policy: unless-stopped
     state: started
-    # Network host is nodig om sensoren in je netwerk te ontdekken via mDNS
-    network_mode: host
+    networks:
+      - name: t2_network
+    ports:
+      - "6052:6052"
     privileged: true
     volumes:
       - "{{ docker_base_path }}/esphome:/config"

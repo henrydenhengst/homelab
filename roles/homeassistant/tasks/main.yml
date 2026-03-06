@@ -1,19 +1,31 @@
 ---
+# roles/homeassistant/tasks/main.yml
+
 - name: Maak directory voor Home Assistant configuratie
-  file:
+  ansible.builtin.file:
     path: "{{ docker_base_path }}/homeassistant"
     state: directory
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
     mode: '0755'
 
 - name: Plaats Home Assistant configuratie
-  template:
+  ansible.builtin.template:
     src: configuration.yaml.j2
     dest: "{{ docker_base_path }}/homeassistant/configuration.yaml"
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
     mode: '0644'
     force: yes
 
+- name: Wacht tot de Postgres database bereikbaar is op localhost
+  ansible.builtin.wait_for:
+    host: 127.0.0.1  # We checken nu lokaal op de server ipv via de containernaam
+    port: 5432
+    timeout: 30
+
 - name: Start Home Assistant container
-  docker_container:
+  community.docker.docker_container:
     name: homeassistant
     image: ghcr.io/home-assistant/home-assistant:stable
     state: started

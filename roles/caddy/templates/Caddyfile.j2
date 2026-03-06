@@ -1,22 +1,48 @@
-{{ duckdns_domain }}.{{ domain }} {
-    reverse_proxy flame:5005 {
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
+{
+    # Gebruik je domeinnaam om een admin-email te genereren voor Let's Encrypt
+    email admin@{{ duckdns_domain }}.{{ domain }}
+}
+
+# Macro voor de DNS-01 challenge via DuckDNS API
+(duckdns_auth) {
+    tls {
+        dns duckdns {env.DUCKDNS_TOKEN}
     }
 }
 
-{{ zigbee_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
-    reverse_proxy zigbee2mqtt:8080
-}
-
+# 1. Home Assistant (homeassistant.denhengst.duckdns.org)
 {{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
     reverse_proxy homeassistant:8123
 }
 
-# Vaultwarden Proxy
+# 2. Flame Dashboard / Hoofddomein (denhengst.duckdns.org)
+{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
+    reverse_proxy flame:5005
+}
+
+# 3. Zigbee2MQTT (zigbee.denhengst.duckdns.org)
+{{ zigbee_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
+    reverse_proxy zigbee2mqtt:8080
+}
+
+# 4. Vaultwarden (vault.denhengst.duckdns.org)
 vault.{{ duckdns_domain }}.{{ domain }} {
-    reverse_proxy vaultwarden:80 {
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
-    }
+    import duckdns_auth
+    reverse_proxy vaultwarden:80
+}
+
+# 5. Portainer (portainer.denhengst.duckdns.org)
+{{ portainer_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
+    reverse_proxy portainer:9000
+}
+
+# 6. ESPHome (esphome.denhengst.duckdns.org)
+esphome.{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
+    # Let op: De container naam in Ansible moet exact 'esphome' zijn
+    reverse_proxy esphome:6052
 }

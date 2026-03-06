@@ -15,14 +15,17 @@
     dest: "{{ docker_base_path }}/caddy/Caddyfile"
     mode: '0644'
 
-- name: Start Caddy container
+- name: Start Caddy container (DNS Challenge Mode)
   docker_container:
     name: caddy
-    image: caddy:latest
+    image: serfriz/caddy-duckdns:latest
     state: started
     restart_policy: unless-stopped
     networks:
       - name: "{{ docker_network_name }}"
+    env:
+      # Hier koppelen we jouw token uit secret.yml aan de container
+      DUCKDNS_TOKEN: "{{ duckdns_token }}"
     ports:
       - "80:80"
       - "443:443"
