@@ -5,7 +5,7 @@
   gather_facts: yes
 
   roles:
-    # 1. 🏗️ De Fundering (Eerst Docker, dan de rest)
+    # 1. 🏗️ De Fundering
     - role: common
     - role: security
     - role: fail2ban
@@ -20,6 +20,7 @@
     - role: vaultwarden
     - role: postgres
     - role: mosquitto
+    - role: gotify
 
     # 4. 🔍 Hardware & Bridges
     - { role: zigbee2mqtt, when: "zigbee_device is defined" }
@@ -33,7 +34,6 @@
     # 6. 📂 Backups
     - role: rsync
     - role: rclone
-
 
   tasks:
     - name: "🔍 Voer de finale Systeem Healthcheck uit"

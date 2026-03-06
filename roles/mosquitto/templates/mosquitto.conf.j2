@@ -2,7 +2,13 @@ persistence true
 persistence_location /mosquitto/data/
 log_dest file /mosquitto/log/mosquitto.log
 
-# Luister op de standaard poort
+# Standaard MQTT (Poort 1883)
 listener 1883
-# Voor nu even geen wachtwoord nodig (lokaal netwerk)
-allow_anonymous true
+allow_anonymous false
+password_file /mosquitto/config/password_file
+
+# WebSockets (Poort 9001) voor Caddy
+listener 9001
+protocol websockets
+allow_anonymous false
+password_file /mosquitto/config/password_file

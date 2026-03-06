@@ -1,0 +1,41 @@
+---
+- name: Maak Gotify data directory
+  file:
+    path: "{{ docker_base_path }}/gotify/data"
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+
+- name: START GOTIFY
+  community.docker.docker_container:
+    name: gotify
+    image: gotify/server:latest
+    state: started
+    restart_policy: always
+    pull: yes
+    recreate: yes
+    container_default_behavior: no_defaults
+    networks:
+      - name: "t2_network"
+    volumes:
+      - "{{ docker_base_path }}/gotify/data:/app/data"
+    env:
+      GOTIFY_DEFAULTUSER_PASS: "{{ gotify_password }}"
+      TZ: "{{ timezone }}"
+      GOTIFY_DATABASE_CONNECTION: "data/gotify.db"
+    labels:
+      com.docker.compose.service: "gotify"
+    # Gebruik een interne healthcheck in plaats van een externe poort-scan
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+- name: Bevestig dat Gotify container draait
+  community.docker.docker_container_info:
+    name: gotify
+  register: gotify_info
+  failed_when: not gotify_info.exists or not gotify_info.container.State.Running

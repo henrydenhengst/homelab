@@ -10,39 +10,56 @@
     }
 }
 
-# 1. Home Assistant (homeassistant.denhengst.duckdns.org)
+# 1. Home Assistant
 {{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     reverse_proxy homeassistant:8123
 }
 
-# 2. Flame Dashboard / Hoofddomein (denhengst.duckdns.org)
+# 2. Hoofddomein (Flame Dashboard)
 {{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     reverse_proxy flame:5005
 }
 
-# 3. Zigbee2MQTT (zigbee.denhengst.duckdns.org)
+# 3. Zigbee2MQTT
 {{ zigbee_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     reverse_proxy zigbee2mqtt:8080
 }
 
-# 4. Vaultwarden (vault.denhengst.duckdns.org)
-vault.{{ duckdns_domain }}.{{ domain }} {
+# 4. Vaultwarden
+{{ vault_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     reverse_proxy vaultwarden:80
 }
 
-# 5. Portainer (portainer.denhengst.duckdns.org)
+# 5. Portainer
 {{ portainer_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     reverse_proxy portainer:9000
 }
 
-# 6. ESPHome (esphome.denhengst.duckdns.org)
-esphome.{{ duckdns_domain }}.{{ domain }} {
+# 6. ESPHome
+{{ esphome_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
-    # Let op: De container naam in Ansible moet exact 'esphome' zijn
     reverse_proxy esphome:6052
+}
+
+# 7. Gotify (Notificatie server)
+{{ gotify_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
+    reverse_proxy gotify:80
+}
+
+# 8. Mosquitto (MQTT via WebSockets)
+{{ mqtt_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
+    
+    # Extra Basic Auth beveiliging (password: "{{ mqtt_admin_password }}")
+    basicauth {
+        admin {{ mqtt_admin_hash }}
+    }
+
+    reverse_proxy mosquitto:9001
 }

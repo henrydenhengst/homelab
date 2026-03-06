@@ -1,24 +1,60 @@
 ---
-- name: Maak Mosquitto directories
+- name: Maak Mosquitto directories met juiste rechten (UID 1883)
   file:
     path: "{{ docker_base_path }}/mosquitto/{{ item }}"
     state: directory
+    owner: "1883"
+    group: "1883"
     mode: '0755'
   with_items: [config, data, log]
 
-- name: Plaats Mosquitto configuratie
+- name: Zorg dat password_file bestaat (voorkomt crash bij start)
+  file:
+    path: "{{ docker_base_path }}/mosquitto/config/password_file"
+    state: touch
+    owner: "1883"
+    group: "1883"
+    mode: '0600'
+
+- name: Plaats Mosquitto configuratie template
   template:
     src: mosquitto.conf.j2
     dest: "{{ docker_base_path }}/mosquitto/config/mosquitto.conf"
+    owner: "1883"
+    group: "1883"
+    mode: '0644'
 
 - name: Start Mosquitto container
   docker_container:
     name: mosquitto
     image: eclipse-mosquitto:latest
     restart_policy: always
+    state: started
+    recreate: yes
     networks:
       - name: "t2_network"
+    ports:
+      - "1883:1883"
+      - "9001:9001"
     volumes:
-      - "{{ docker_base_path }}/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+      - "{{ docker_base_path }}/mosquitto/config:/mosquitto/config"
       - "{{ docker_base_path }}/mosquitto/data:/mosquitto/data"
       - "{{ docker_base_path }}/mosquitto/log:/mosquitto/log"
+
+- name: Voeg admin gebruiker toe (gebruikt wachtwoord uit secrets.yml)
+  shell: docker exec mosquitto mosquitto_passwd -b /mosquitto/config/password_file admin {{ mqtt_password }}
+  no_log: true
+  register: mqtt_auth_result
+  changed_when: "'Updating' in mqtt_auth_result.stdout or 'Adding' in mqtt_auth_result.stdout"
+
+- name: Herstart Mosquitto om de nieuwe password_file te laden
+  docker_container:
+    name: mosquitto
+    state: started
+    restart: yes
+
+- name: 🦟 Wacht tot Mosquitto luistert op poort 1883
+  wait_for:
+    port: 1883
+    host: "{{ ansible_host }}"
+    timeout: 30

@@ -25,6 +25,9 @@
     state: started
     restart_policy: always
     privileged: true
+    # De poort-mapping die de 502 en de timeout heeft opgelost:
+    ports:
+      - "8080:8080"
     networks:
       - name: "t2_network"
     volumes:
@@ -34,3 +37,12 @@
       - "{{ zigbee_device }}:/dev/ttyUSB0"
     env:
       TZ: "{{ timezone }}"
+    recreate: yes
+
+- name: Wacht tot de Zigbee2MQTT Frontend bereikbaar is (Poort 8080)
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 8080
+    delay: 10      # Geef de container tijd om de USB-stick te initialiseren
+    timeout: 120   # Ruime marge voor database-migraties
+    msg: "⚠️ Zigbee2MQTT frontend start traag of niet. Check: docker logs zigbee2mqtt"
