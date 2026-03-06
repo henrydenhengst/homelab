@@ -29,6 +29,16 @@ Om hardware-resources optimaal te benutten (geen verspilling) en om een reproduc
 
 ---
 
+## 🌳 Vrijheid voor iedereen (Non-profit & Open Source)
+Dit project is en blijft **100% gratis**. 
+
+* **Geen winstoogmerk:** Ik bouw dit niet om geld te verdienen, maar om slimme technologie toegankelijk te maken voor iedereen.
+* **Hergebruik:** Het doel is om oude computers een tweede leven te geven in plaats van ze weg te gooien.
+* **Jouw data is van jou:** Omdat alles lokaal draait op jouw eigen hardware (en niet in de 'cloud'), heeft geen enkel bedrijf inzage in jouw huis.
+* **Open Kaart:** Iedereen mag de code inzien, aanpassen en verbeteren. Dat is wat we bedoelen met de "MIT-licentie": volledige vrijheid.
+
+---
+
 ## ✨ Features
 
 - 🛡️ Core Infrastructure & Security
