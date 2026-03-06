@@ -10,53 +10,63 @@
     }
 }
 
-# 1. Home Assistant
+# Macro voor Basic Auth (beveiliging voor open dashboards)
+(basic_auth) {
+    basicauth {
+        {{ caddy_admin_user }} {{ caddy_admin_password_hash }}
+    }
+}
+
+# 1. Home Assistant (Heeft eigen login)
 {{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     reverse_proxy homeassistant:8123
 }
 
-# 2. Hoofddomein (Flame Dashboard)
+# 2. Hoofddomein (Flame Dashboard - NU BEVEILIGD)
 {{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
+    import basic_auth
     reverse_proxy flame:5005
 }
 
-# 3. Zigbee2MQTT
+# 3. Zigbee2MQTT (NU BEVEILIGD)
 {{ zigbee_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
+    import basic_auth
     reverse_proxy zigbee2mqtt:8080
 }
 
-# 4. Vaultwarden
+# 4. Vaultwarden (Heeft eigen login)
 {{ vault_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     reverse_proxy vaultwarden:80
 }
 
-# 5. Portainer
+# 5. Portainer (Heeft eigen login)
 {{ portainer_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     reverse_proxy portainer:9000
 }
 
-# 6. ESPHome
+# 6. ESPHome (NU BEVEILIGD)
 {{ esphome_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
+    import basic_auth
     reverse_proxy esphome:6052
 }
 
-# 7. Gotify (Notificatie server)
+# 7. Gotify (Notificatie server - Heeft eigen login)
 {{ gotify_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     reverse_proxy gotify:80
 }
 
-# 8. Mosquitto (MQTT via WebSockets)
+# 8. Mosquitto (MQTT via WebSockets - Reeds beveiligd)
 {{ mqtt_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     
-    # Extra Basic Auth beveiliging (password: "{{ mqtt_admin_password }}")
+    # Extra Basic Auth beveiliging voor MQTT WebSockets
     basicauth {
         admin {{ mqtt_admin_hash }}
     }
