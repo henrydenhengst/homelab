@@ -160,9 +160,7 @@ If these three apps are on your phone and you can log in, your system is ready t
 
 ## 3. Configuration
 
-- Essential Variables
-
-  ## 🔑 Essential Variables - change to your taste
+- ### 🔑 Essential Variables - change to your taste
 
   Create your `group_vars/all/secret.yml` file with these variables:
 
@@ -213,11 +211,9 @@ If these three apps are on your phone and you can log in, your system is ready t
   vault_postgres_password: "StrongPassword123!"
   vault_rclone_token: '{"token":"replace-me"}'
 
-- Optional Customizations
+- ### 🎨 Optional Customizations
 
-  ## 🎨 Optional Customizations
-
-  ### Use It As-Is, Or Make It Your Own
+  #### Use It As-Is, Or Make It Your Own
 
   The beauty of Infrastructure as Code is flexibility. You can:
 
@@ -236,7 +232,7 @@ If these three apps are on your phone and you can log in, your system is ready t
   | **Customize dashboards** | Flame layout, theme, colors—make it yours |
   | **Add your own automations** | Home Assistant automations, custom scripts |
 
-  ### No Wrong Answers
+  #### No Wrong Answers
 
   Whether you keep it 100% stock or hack it into something completely different:
 
@@ -246,84 +242,81 @@ If these three apps are on your phone and you can log in, your system is ready t
 
   > 💡 **Pro tip:** Fork the repository and make it your own. Your customizations, version-controlled, forever.
 
-- Security Features Explained
-
-  ## 🔒 Security Features Explained
+- ### 🔒 Security Features Explained
 
   You've built a solid foundation for your homelab security. By combining Ansible automation with the "Golden State" principle, you minimize human errors—which is already a massive security advantage.
 
   Here's a breakdown of the key security features in your project:
 
-  ### 1. Access Control & Network
+  #### 1. Access Control & Network
 
   - **Reverse Proxy (Caddy):** Caddy acts as your "bouncer." No container (except the proxy itself) is directly reachable from the internet.
   - **Automatic SSL (HTTPS):** Caddy automatically handles your certificates, ensuring all traffic between your devices and the server is encrypted.
   - **Basic Auth:** For applications that lack built-in (strong) authentication (like ESPHome, Zigbee2MQTT, and Flame), you enforce an extra password layer via Caddy.
   - **Trusted Proxies:** In Home Assistant, you configure `trusted_proxies`, so HA only accepts traffic coming through your secure Caddy container.
 
-  ### 2. Data Protection & Passwords
+  #### 2. Data Protection & Passwords
 
   - **Ansible Vault:** Sensitive information like passwords, API keys, and Wi-Fi credentials aren't stored in plain text. They're encrypted in a vault that only opens with your master password.
   - **Vaultwarden:** You run your own password manager, allowing you to generate unique, complex passwords for every service without relying on external parties.
   - **Hashed Passwords:** Your configuration files use hashed password variants. Even if someone were to see your Caddyfile, they couldn't read your actual passwords.
 
-  ### 3. Container & System Security
+  #### 3. Container & System Security
 
   - **Docker Isolation:** Each service runs in its own container. If one service (e.g., Flame) has a vulnerability, the rest of your system remains isolated.
   - **Prune Policy:** Your `docker system prune` strategy keeps the system clean of old, unused images that might contain security vulnerabilities.
   - **Update Management:** Since everything is deployed via Ansible (`site.yml`), you can update all your containers to the latest, most secure versions with a single command.
 
-  ### 4. Integrity & Recovery (Backup)
+  #### 4. Integrity & Recovery (Backup)
 
   - **Rsync (Local):** You ensure continuity with a local copy of your `/opt/appdata`. If a configuration breaks, you can immediately roll back to a working state.
   - **Rclone (Cloud):** By sending encrypted backups to the cloud, you're protected against physical disasters (like theft or hardware failure).
   - **Power Disconnect:** Your security plan includes physical safety too—cutting power to equipment when away reduces the risk of overheating or short circuits from cheaper adapters.
 
-  ### 5. Monitoring & Notifications
+  #### 5. Monitoring & Notifications
 
   - **Gotify:** You've set up your own notification channel. This lets you receive immediate alerts when unusual events occur (e.g., a server reboot or a failed backup).
 
   > 💡 **Security by design, not by accident.** Every layer is automated, reproducible, and built to last.
 
+---
 
-### 4. Understanding the Stack
-- Services Overview
-
-  ## 🏠 What This System Does For You
+## 4. Understanding the Stack
+- ### 🏠 Services Overview: What This System Does For You
 
   Looking at your GitHub and the [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention) integration, here are the **5 core services** this system delivers in your daily life:
 
-  ### 1. Energy Management (Savings & Insights)
+  #### 1. Energy Management (Savings & Insights)
   *This is currently your most important service.*
 
   - **Vampire Slayer:** The system detects when equipment (TV, soundbar, game consoles) is in standby and physically cuts power via IKEA and Refoss smart plugs.
   - **Live Monitoring:** A real-time dashboard shows exactly how many watts you're consuming right now—and what it costs.
   - **Historical Overview:** See where the "power vampires" are hiding, per day, week, or month.
 
-  ### 2. Centralized Entertainment Control
+  #### 2. Centralized Entertainment Control
   *No more juggling 5 different apps for all your screens:*
 
   - **Unified Media Player:** One interface in Home Assistant (and on your Flame dashboard) to see and control all Android TVs, Chromecasts, and the JBL Partybox.
   - **Status Check:** At a glance, see if Denzel's Nintendo Switch in his room is still on.
 
-  ### 3. Climate & Comfort Monitoring
+  #### 3. Climate & Comfort Monitoring
   - **Environment Insights:** Sonoff sensors give you temperature and humidity data everywhere (living room, bathroom, bedrooms).
   - **Mold Prevention:** Automatic alerts (via Gotify) if bathroom humidity stays too high after showering.
 
-  ### 4. Infrastructure & Security "as a Service"
+  #### 4. Infrastructure & Security "as a Service"
   *This is the "invisible" layer that keeps everything running:*
 
   - **Password Vault:** Vaultwarden gives you secure, self-hosted storage for all your login credentials—accessible everywhere, but yours only.
   - **Notification Hub:** Gotify provides your own messaging service (independent of Google or Apple) for system alerts and warnings.
   - **Zero-Maintenance Backups:** Rsync and Rclone ensure your configuration (built with blood, sweat, and cola) is never lost.
 
-  ### 5. Ease of Use (The "Single Source of Truth")
+  #### 5. Ease of Use (The "Single Source of Truth")
   - **[Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention):** Never search for "Lamp_123" again. Everything has logical names (`light.livingroom_tv_left_lamp`), making new automations 10x faster to build.
   - **Flame Dashboard:** One start page for the whole family—buttons to all important services, no need to remember IP addresses or ports.
 
-  **In short:** You're not just building a server; you're building a **personal utility company** that delivers savings, overview, and peace of mind.
+  > **In short:** You're not just building a server; you're building a **personal utility company** that delivers savings, overview, and peace of mind.
 
-- Project Structure
+- ### Project Structure
   > How Data Flows
 
   ```text
@@ -374,7 +367,7 @@ If these three apps are on your phone and you can log in, your system is ready t
          └── hardware_discovery/   # Auto-detects USB devices (Zigbee, etc.)
   ```
 
-  ## 🧩 Key Files
+  ### 🧩 Key Files
 
   | File | Purpose |
   |------|---------|
@@ -384,7 +377,7 @@ If these three apps are on your phone and you can log in, your system is ready t
   | `group_vars/all/secret.yml` | Your encrypted secrets (passwords, tokens) |
   | `group_vars/all/secret.example.yml` | Template for required variables |
 
-  ## 🔄 How It All Fits Together
+  ### 🔄 How It All Fits Together
 
   1. **Core roles** prepare the base system
   2. **Networking roles** establish connectivity
@@ -393,9 +386,7 @@ If these three apps are on your phone and you can log in, your system is ready t
   5. **Utilities** add convenience and backup
   6. **Discovery** ensures hardware is properly detected
 
-- Performance & Scaling
-
-  ## ⚡ Performance & Scaling
+- ## ⚡ Performance & Scaling
 
   ### 1. Docker Resource Management (Performance)
 
