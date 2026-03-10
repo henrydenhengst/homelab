@@ -1,0 +1,84 @@
+---
+- name: "EU Universal Energy & Infra Manager"
+  hosts: docker_host
+  become: yes
+  vars:
+    # =========================================================================
+    # KEY REGIONAL CODES REFERENCE (EIC)
+    # -------------------------------------------------------------------------
+    # NETHERLANDS (NL):    "10YNL----------L"
+    # GERMANY (DE/LU):     "10Y1001A1001A83F"
+    # BELGIUM (BE):        "10YBE----------2"
+    # FRANCE (FR):         "10YFR-RTE------C"
+    # SPAIN (ES):          "10YES-REE------0"
+    # ITALY (National):    "10Y1001A1001A737"
+    # AUSTRIA (AT):        "10YAT-APG------L"
+    # DENMARK (DK1):       "10Y1001A1001A65H"
+    # SWEDEN (SE3):        "10Y1001A1001A46L"
+    # POLAND (PL):         "10YPL-AREA-----S"
+    # =========================================================================
+    region_code: "10YNL----------L" 
+
+    # --- CONFIGURATION ---
+    ha_host_config_dir: "/opt/homeassistant/config"
+    ha_container_name: "homeassistant"
+    gotify_url: "http://192.168.1.10:8080"
+    gotify_token: "YOUR_GOTIFY_TOKEN"
+    entsoe_token: "YOUR_ENTSOE_API_TOKEN"
+    price_threshold: 0.15
+
+  tasks:
+    # --- INFRASTRUCTURE ---
+    - name: "Check HACS status"
+      # EN: Ensure HACS is installed
+      stat:
+        path: "{{ ha_host_config_dir }}/custom_components/hacs"
+      register: hacs_folder
+
+    - name: "Install HACS"
+      # EN: Download HACS via Docker
+      shell: "docker exec {{ ha_container_name }} wget -O - https://get.hacs.xyz | bash -"
+      when: not hacs_folder.stat.exists
+      notify: "Restart Home Assistant"
+
+    # --- DATA & LOGIC ---
+    - name: "Fetch Energy Prices"
+      # EN: Retrieve daily prices from ENTSO-E
+      uri:
+        url: "https://web-api.tp.entsoe.eu/api?securityToken={{ entsoe_token }}&documentType=A44&in_Domain={{ region_code }}&out_Domain={{ region_code }}&periodStart={{ ansible_date_time.date | replace('-','') }}0000&periodEnd={{ ansible_date_time.date | replace('-','') }}2300"
+        method: GET
+        return_content: yes
+      register: energy_response
+
+    - name: "Analyze Prices"
+      # DE: Tagestiefstpreis berechnen
+      set_fact:
+        all_prices: "{{ energy_response.content | regex_findall('<price.amount>(.*?)</price.amount>') | map('float') | list }}"
+        lowest_price: "{{ (energy_response.content | regex_findall('<price.amount>(.*?)</price.amount>') | map('float') | min) / 1000 }}"
+        current_hour: "{{ ansible_date_time.hour | int }}"
+
+    - name: "Extract Current Hour"
+      # FR: Faire correspondre le prix à l'heure actuelle
+      set_fact:
+        price_now: "{{ all_prices[current_hour] | float / 1000 }}"
+
+    # --- NOTIFICATIONS ---
+    - name: "Push Alert"
+      # ES: ¡Mínimo diario alcanzado! | IT: Minimo giornaliero raggiunto!
+      uri:
+        url: "{{ gotify_url }}/message?token={{ gotify_token }}"
+        method: POST
+        body_format: json
+        body:
+          title: "📉 EU Energy Low"
+          message: "Current price €{{ price_now }} is the lowest today."
+          priority: 6
+      when: 
+        - price_now | float <= lowest_price | float
+        - price_now | float <= price_threshold | float
+
+  handlers:
+    - name: "Restart Home Assistant"
+      community.docker.docker_container:
+        name: "{{ ha_container_name }}"
+        restart: yes

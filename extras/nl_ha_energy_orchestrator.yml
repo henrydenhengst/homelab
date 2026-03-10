@@ -1,0 +1,67 @@
+---
+- name: "Home Assistant & Gotify: Daluren Manager"
+  hosts: docker_host
+  become: yes
+  vars:
+    # --- CONFIGURATIE (Pas dit aan) ---
+    ha_host_config_dir: "/opt/homeassistant/config"
+    ha_container_name: "homeassistant"
+    gotify_url: "http://192.168.1.10:8080"
+    gotify_token: "JOUW_GOTIFY_APP_TOKEN"
+    price_threshold: 0.15  # Alleen melding als de dalprijs onder de 15 cent is
+
+  tasks:
+    # --- DEEL 1: INSTALLATIE (HACS) ---
+    - name: "Check of HACS al is geïnstalleerd"
+      stat:
+        path: "{{ ha_host_config_dir }}/custom_components/hacs"
+      register: hacs_folder
+
+    - name: "Installatie HACS indien niet aanwezig"
+      block:
+        - name: "HACS downloaden en installeren in container"
+          shell: "docker exec {{ ha_container_name }} wget -O - https://get.hacs.xyz | bash -"
+        
+        - name: "Herstart Home Assistant Container"
+          community.docker.docker_container:
+            name: "{{ ha_container_name }}"
+            restart: yes
+            state: started
+      when: not hacs_folder.stat.exists
+
+    # --- DEEL 2: DALUREN LOGICA ---
+    - name: "Haal actuele energieprijzen op (Frank Energie API)"
+      uri:
+        url: "https://frank-graphql-prod.graphcdn.app/"
+        method: POST
+        body_format: json
+        body:
+          query: "{ marketPrices { electricity { from, marketPrice } } }"
+      register: energy_response
+
+    - name: "Analyseer prijzen van vandaag"
+      set_fact:
+        all_prices: "{{ energy_response.json.data.marketPrices.electricity }}"
+        # Zoek de allerlaagste prijs van vandaag
+        lowest_price_today: "{{ energy_response.json.data.marketPrices.electricity | map(attribute='marketPrice') | min }}"
+        # Bepaal het huidige uur (ISO formaat)
+        current_hour_iso: "{{ ansible_date_time.date }}T{{ ansible_date_time.hour }}:00:00"
+
+    - name: "Bepaal prijs van dit uur"
+      set_fact:
+        price_now: "{{ (all_prices | selectattr('from', 'search', current_hour_iso) | first).marketPrice }}"
+
+    # --- DEEL 3: PUSH NAAR GOTIFY ---
+    - name: "Push bericht als dit HET daluur is"
+      uri:
+        url: "{{ gotify_url }}/message?token={{ gotify_token }}"
+        method: POST
+        body_format: json
+        body:
+          title: "📉 Energie Daluren Alert"
+          message: "Het is nu het goedkoopste moment van de dag! De prijs is slechts €{{ price_now }} per kWh."
+          priority: 6
+      # Voorwaarde: Nu is het goedkoopst én onder de drempelwaarde
+      when: 
+        - price_now | float <= lowest_price_today | float
+        - price_now | float <= price_threshold | float
