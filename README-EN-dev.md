@@ -2,7 +2,7 @@
 
 > This project is an Infrastructure-as-Code suite that strips a Linux server down to its essentials and configures it as an optimized, headless Docker host for services like Home Assistant and Vaultwarden.
 
-### 🛠️ Tech Stack & Status
+## 🛠️ Tech Stack & Status
 
   | Categorie | Badges |
   | :--- | :--- |
@@ -12,11 +12,11 @@
   | **Security** | ![Lynis](https://img.shields.io/badge/Lynis_Index-66%2F100-orange?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square) |
   | **Health** | ![Build](https://img.shields.io/badge/Build-passing-brightgreen?style=flat-square) ![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=flat-square) |
 
-### 1. Project Overview
-- Project Vision / Why This Exists
-  
-  ## 🎯 Project Vision
-  
+---
+
+## 1. Project Overview
+- ### 🎯 Project Vision / Why This Exists
+    
   Why build this when there are so many other homelab setups?
   
   - **Reproducibility First:** Your homelab should be a code repository, not a snowflake server
@@ -24,27 +24,24 @@
   - **Sustainability:** Give old hardware a second life instead of buying new
   - **Learning by Doing:** Understand every component of your smart home
 
-- Key Features
-  
-  ## 🔧 Key Features
-  
-  ### 🛡️ Security by Default
+- ### 🔧 Key Features
+    
+  #### 🛡️ Security by Default
   - Automated system hardening with Lynis
   - Fail2ban for intrusion prevention
   - Automatic SSL certificates via Caddy
   - Encrypted secrets with Ansible Vault
   - Regular security updates
 
-- Tech Stack
+- ### 🛠️ Tech Stack
 
-🛠️ Tech Stack
-  - Ansible: For configuration management and automation.
-  - Docker: For containerization of all services.
-  - Python: As the runtime for Ansible and custom scripts.
-  - PostgreSQL: For persistent and secure data storage.
-  - YAML: For readable Infrastructure-as-Code.
+  - **Ansible**: For configuration management and automation.
+  - **Docker**: For containerization of all services.
+  - **Python**: As the runtime for Ansible and custom scripts.
+  - **PostgreSQL**: For persistent and secure data storage.
+  - **YAML**: For readable Infrastructure-as-Code.
 
-- Project Structure
+- ### Project Structure
   ```
   homelab/
   ├── group_vars/        # Global configuration variables
@@ -73,13 +70,14 @@
         ├── rclone       # Cloud backups
         └── ...          # And more!
    ```
-### 2. Getting Started
 
-- Prerequisites (Local machine + Target server)
+---
+
+## 2. Getting Started
+
+- ### 📋 Prerequisites
   
-  ## 📋 Prerequisites
-  
-  ### On Your Target Server
+  #### 🖥️ On Your Target Server
   - A Linux server (Debian/Ubuntu/RedHat/Arch) with:
     - 2+ CPU cores (4+ CPU cores recommended)
     - 4GB+ RAM (8GB RAM recommended)
@@ -87,38 +85,35 @@
     - SSH access to the server
     - (Optional) Zigbee dongle and others for smart home devices
 
-- Hardware Recommendations
-  
-  ## 🖥️ Hardware Recommendations
-  
-  ### Tested & Proven
-  - **Intel N100/N95 Mini-PCs** (Beelink, Minisforum, etc.)
-  - **HP EliteDesk/ProDesk Mini** G2, G3, G4
-  - **Intel NUC** 7th gen and newer
-  - **USB DISK** 500+ GB
-
-  ### What to Avoid
-  - ❌ Raspberry Pi 4 (ARM, limited RAM, SD card issues)
-  - ❌ Old Pentium/Celeron (pre-2015) - lacks AES-NI for encryption
-  - ❌ Consumer NAS devices - limited OS flexibility
-  - ❌ SD cards as primary storage - too slow, unreliable
-
-  ### Recommended Zigbee/Z-Wave Adapters
-  - **Sonoff Zigbee 3.0 USB Dongle Plus** - Best value
-  - **Home Assistant SkyConnect** - Works out of box
-  - **Conbee II/III** - Solid performer
-  - **Zooz Z-Wave Stick** - For Z-Wave networks
-
-  ## 🌐 Network Requirements
-  
+  #### 🌐 Network Requirements  
   - **Wired Ethernet connection** (Wi-Fi not recommended for stability)
   - **DHCP reservation** or **static IP** on your server
   - **Port forwarding**:
     - Port 80/tcp (for SSL certificate issuance)
     - Port 443/tcp (for HTTPS access)
   - **DuckDNS account** (free) for dynamic DNS
+
+- ### 🖥️ Hardware Recommendations
+  
+  #### Tested & Proven
+  - **Intel N100/N95 Mini-PCs** (Beelink, Minisforum, etc.)
+  - **HP EliteDesk/ProDesk Mini** G2, G3, G4
+  - **Intel NUC** 7th gen and newer
+  - **USB DISK** 500+ GB
+
+  #### Recommended Zigbee/Z-Wave Adapters
+  - **Sonoff Zigbee 3.0 USB Dongle Plus** - Best value
+  - **Home Assistant SkyConnect** - Works out of box
+  - **Conbee II/III** - Solid performer
+  - **Zooz Z-Wave Stick** - For Z-Wave networks
+
+  #### What to Avoid
+  - ❌ Raspberry Pi 4 (ARM, limited RAM, SD card issues)
+  - ❌ Old Pentium/Celeron (pre-2015) - lacks AES-NI for encryption
+  - ❌ Consumer NAS devices - limited OS flexibility
+  - ❌ SD cards as primary storage - too slow, unreliable
     
-- Quick Start Installation Server
+- ### Quick Start Installation Server
 
   ```bash
   git clone https://github.com/henrydenhengst/homelab.git
@@ -130,7 +125,7 @@
   ansible-playbook site.yml --tags healthcheck --ask-vault-pass # Verify the installation
   ```
 
-- Quick Start Installation Phone
+- ### Quick Start Installation Phone
   
   You need three apps on your phone. After installation, you won't need to check them again.
   
@@ -159,13 +154,11 @@
   
   > 💡 **Telegram is for you.** This is where you'll get notifications like "Kitchen light acting up" or "Sensor battery is low." You can also send commands here (e.g., `/status`).
 
----
-
-## ✅ All Set?
-
 If these three apps are on your phone and you can log in, your system is ready to use. You won't hear from us again unless something important comes up (and then via Gotify or Telegram).
 
-### 3. Configuration
+---
+
+## 3. Configuration
 
 - Essential Variables
 
