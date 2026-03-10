@@ -300,7 +300,7 @@ If these three apps are on your phone and you can log in, your system is ready t
 
   ## 🏠 What This System Does For You
 
-  Looking at your GitHub and the [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention){:target="_blank"} integration, here are the **5 core services** this system delivers in your daily life:
+  Looking at your GitHub and the [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention) integration, here are the **5 core services** this system delivers in your daily life:
 
   ### 1. Energy Management (Savings & Insights)
   *This is currently your most important service.*
@@ -327,7 +327,7 @@ If these three apps are on your phone and you can log in, your system is ready t
   - **Zero-Maintenance Backups:** Rsync and Rclone ensure your configuration (built with blood, sweat, and cola) is never lost.
 
   ### 5. Ease of Use (The "Single Source of Truth")
-  - **[Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention){:target="_blank"}:** Never search for "Lamp_123" again. Everything has logical names (`light.livingroom_tv_left_lamp`), making new automations 10x faster to build.
+  - **[Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention):** Never search for "Lamp_123" again. Everything has logical names (`light.livingroom_tv_left_lamp`), making new automations 10x faster to build.
   - **Flame Dashboard:** One start page for the whole family—buttons to all important services, no need to remember IP addresses or ports.
 
   **In short:** You're not just building a server; you're building a **personal utility company** that delivers savings, overview, and peace of mind.
@@ -412,12 +412,12 @@ If these three apps are on your phone and you can log in, your system is ready t
   - **Network Stack:** Since everything runs in a single Docker network, services (e.g., Home Assistant to Mosquitto) communicate via the internal Docker bridge. This is many times faster than communication through your physical router or Wi-Fi network.
   - **I/O Optimization:** By running your databases (like Home Assistant's SQLite or Vaultwarden's database) on an SSD and limiting logs via Docker logging drivers, you prevent system slowdowns caused by disk activity.
 
-  ### 2. The [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention){:target="_blank"} as a Scaling Advantage
+  ### 2. The [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention) as a Scaling Advantage
 
   Scaling isn't just about hardware—it's about the manageability of your data:
 
   - **Predictability:** Using the `domain.location_type_function_id` structure means you can add 50 new lights tomorrow without your naming conventions turning into a mess.
-  - **Automation:** In Ansible, you can now work with loops. Instead of configuring each device individually, you input one list of [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention){:target="_blank"} names and let Ansible do the rest. This scales from 5 to 500 devices with zero extra effort.
+  - **Automation:** In Ansible, you can now work with loops. Instead of configuring each device individually, you input one list of [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention) names and let Ansible do the rest. This scales from 5 to 500 devices with zero extra effort.
 
   ### 3. Protocol Efficiency
 
