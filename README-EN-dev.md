@@ -386,38 +386,40 @@ If these three apps are on your phone and you can log in, your system is ready t
   5. **Utilities** add convenience and backup
   6. **Discovery** ensures hardware is properly detected
 
-- ## ⚡ Performance & Scaling
+- ### ⚡ Performance & Scaling
 
-  ### 1. Docker Resource Management (Performance)
+  #### 1. Docker Resource Management (Performance)
 
   - **Lightweight Containers:** By choosing services like Mosquitto (MQTT) and Gotify, you're using tools with an extremely low footprint. These consume virtually zero CPU cycles when idle.
   - **Network Stack:** Since everything runs in a single Docker network, services (e.g., Home Assistant to Mosquitto) communicate via the internal Docker bridge. This is many times faster than communication through your physical router or Wi-Fi network.
   - **I/O Optimization:** By running your databases (like Home Assistant's SQLite or Vaultwarden's database) on an SSD and limiting logs via Docker logging drivers, you prevent system slowdowns caused by disk activity.
 
-  ### 2. The [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention) as a Scaling Advantage
+  #### 2. The [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention) as a Scaling Advantage
 
   Scaling isn't just about hardware—it's about the manageability of your data:
 
   - **Predictability:** Using the `domain.location_type_function_id` structure means you can add 50 new lights tomorrow without your naming conventions turning into a mess.
   - **Automation:** In Ansible, you can now work with loops. Instead of configuring each device individually, you input one list of [Trikos Naming Convention](https://github.com/Trikos/Home-Assistant-Naming-Convention) names and let Ansible do the rest. This scales from 5 to 500 devices with zero extra effort.
 
-  ### 3. Protocol Efficiency
+  #### 3. Protocol Efficiency
 
   - **MQTT (Mosquitto):** This is the pinnacle of scaling. Instead of Home Assistant having to ask each sensor every second "What's your value?" (polling), the sensor only "pushes" data when something changes. This saves enormous amounts of processing power.
   - **Zigbee vs. Wi-Fi:** By using Zigbee (via Zigbee2MQTT) for large groups of lights and plugs, you offload your Wi-Fi router. The more Zigbee devices you add, the stronger the mesh network becomes—while more Wi-Fi devices actually slow your network down.
 
-  ### 4. System Cleanup (Pruning)
+  #### 4. System Cleanup (Pruning)
 
   - **Docker Prune:** Your TODO list includes the `docker system prune` command. This is essential for performance: it removes unused layers and volumes that would otherwise clutter your cache and fill your disk—which would ultimately harm Home Assistant's database performance.
 
-  ### 5. Future Growth (Scaling Path)
+  #### 5. Future Growth (Scaling Path)
 
   - **From SQLite to MariaDB/InfluxDB:** If, in a year, you've collected so much data from your P1 meter and Refoss plugs that Home Assistant becomes slow, your current Ansible structure allows you to easily add a heavier database container without overhauling your entire configuration.
 
   **In short:** You're building a foundation that doesn't "clog up." Whether you have 10 or 100 devices, your lights' response time will remain virtually the same.
 
-### 5. Maintenance
-- Regular Maintenance Tasks
+---
+
+## 5. Maintenance
+- ### Regular Maintenance Tasks
 
   #### Weekly
   
@@ -455,7 +457,7 @@ If these three apps are on your phone and you can log in, your system is ready t
   journalctl --since "3 months ago" -p err -g "docker\|homeassistant"
   ```
 
-- Upgrade Guide
+- ### Upgrade Guide
   
   #### Version Upgrades  
   
@@ -478,22 +480,22 @@ If these three apps are on your phone and you can log in, your system is ready t
   ```bash
   ansible-playbook site.yml --ask-vault-pass
   ``` 
-- Backup & Recovery Procedures
-  ### How It Works in Practice:
+- ### Backup & Recovery Procedures
+  #### How It Works in Practice:
   - Configuration: You define the UUID of your external USB backup drive (usb_backup_uuid) and the path to mount it (usb_mount_path) in your group_vars/all/secret.yml file. The rclone role would also require configuration for your cloud storage provider.
   - Automation: While not a separate playbook tag in the current README, the backup process is likely automated. It can be triggered in two ways:
   - As part of the main playbook: The site.yml playbook may include tasks from the rsync and rclone roles to ensure backups are performed regularly.
   - As a separate command: You could run backup-specific tasks using an Ansible tag (e.g., ansible-playbook site.yml --tags backup), although this specific tag isn't listed in the main README.
-  ### The Process:
+  #### The Process:
   - The rsync role would copy data from your server (e.g., /opt/appdata containing Home Assistant, database files, etc.) to the mounted USB drive.
   - The rclone role would then synchronize that local backup (or the data directly) to your configured cloud storage, ensuring the copy is encrypted for security.
 
-- Disaster Recovery
+- ### Disaster Recovery
 
-  ### Restoring a Single File or Configuration:
+  #### Restoring a Single File or Configuration:
   - If you accidentally break a configuration, you can manually restore a specific file or directory directly from the external USB drive mounted at /mnt/backup-usb. This is the fastest way to revert a small mistake.
 
-  ### Full System Recovery (Planned) :
+  #### Full System Recovery (Planned) :
   - The roadmap mentions "Git-based Rollbacks" . This is the ultimate recovery procedure:
   - If the server hardware fails completely, you would set up a new machine with a base Linux OS.
   - You would clone your Homelab repository (git clone ...).
@@ -501,16 +503,16 @@ If these three apps are on your phone and you can log in, your system is ready t
 
   > In summary, your Homelab project establishes a solid foundation for data safety with local and off-site backups, managed as code. The planned enhancements will make the recovery process even more automated and foolproof.
 
-### 6. Operations
+## 6. Operations
 
-- Health Checks & Monitoring
+- ### Health Checks & Monitoring
   - gotify your notification service if anything goes wrong
   - portainer your container management UI
   - additional health and monitoring containers can be implemented to help such as Uptime Kuma, NetData, and or many others.
 
-- Troubleshooting Common Issues
+- ### Troubleshooting Common Issues
 
-  ### Stuck?
+  #### Stuck?
 
   - 1. 📖 **Check the [FAQ](#faq)** – Your question may already be answered
   - 2. 💬 **Ask for help** – Reach out to the community
@@ -522,7 +524,7 @@ If these three apps are on your phone and you can log in, your system is ready t
   > - Relevant logs (Docker, Ansible)
   > - Your hardware setup
 
-- Performance Tuning - Quick Wins (Highest Impact)
+- ### Performance Tuning - Quick Wins (Highest Impact)
 
   - Use SSDs, not SD cards – Biggest performance gain
   - Keep databases on fast storage – Separate from OS if possible
@@ -531,15 +533,15 @@ If these three apps are on your phone and you can log in, your system is ready t
   - Use wired network – Wi-Fi adds latency
   - USB extension cable – For (Zigbee) dongles (reduces interference)
 
-- Logs & Debugging
-  ### The easiest way is to add Dozzle to the stack
+- ### Logs & Debugging
+  #### The easiest way is to add Dozzle to the stack
   - All your containers in one list
   - Live logs updating in real-time
   - Click any container to see its logs
   - Search/filter to find errors
   - No login, no setup, no database
 
-### 7. Security
+## 7. Security
 - Security Features Explained
 - Verification Steps
 - Hardening Details
