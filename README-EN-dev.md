@@ -222,8 +222,6 @@ If these three apps are on your phone and you can log in, your system is ready t
 
 - Optional Customizations
 
-- Optional Customizations
-
   ## 🎨 Optional Customizations
 
   ### Use It As-Is, Or Make It Your Own
@@ -473,7 +471,7 @@ If these three apps are on your phone and you can log in, your system is ready t
   journalctl --since "3 months ago" -p err -g "docker\|homeassistant"
   ```
 
-  - Upgrade Guide
+- Upgrade Guide
   
   #### Version Upgrades  
   
