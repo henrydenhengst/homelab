@@ -45,7 +45,7 @@
   - YAML: For readable Infrastructure-as-Code.
 
 - Project Structure
-
+  ```
   homelab/
   ├── group_vars/        # Global configuration variables
   │   └── all/
@@ -72,7 +72,7 @@
         ├── portainer    # Container management
         ├── rclone       # Cloud backups
         └── ...          # And more!
-
+   ```
 ### 2. Getting Started
 
 - Prerequisites (Local machine + Target server)
