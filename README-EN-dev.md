@@ -496,7 +496,7 @@ If these three apps are on your phone and you can log in, your system is ready t
   - If you accidentally break a configuration, you can manually restore a specific file or directory directly from the external USB drive mounted at /mnt/backup-usb. This is the fastest way to revert a small mistake.
 
   #### Full System Recovery (Planned) :
-  - The roadmap mentions "Git-based Rollbacks" . This is the ultimate recovery procedure:
+  The "Git-based Rollbacks" . This is the ultimate recovery procedure:
   - If the server hardware fails completely, you would set up a new machine with a base Linux OS.
   - You would clone your Homelab repository (git clone ...).
   - You would then run the main Ansible playbook (ansible-playbook site.yml). Because your configuration (including secrets encrypted with Ansible Vault) and backup data are stored separately, the playbook should be able to rebuild the entire system to its last known "Golden State" and restore the latest data from your backups.
