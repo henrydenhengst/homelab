@@ -41,3 +41,11 @@
       TZ: "Europe/Amsterdam"
     published_ports:
       - "8123:8123"
+
+# ... Bestaande taken van Henry ...
+
+- name: "Haarlem 2037LL: Activeer specifieke sensoren en alerts"
+  ansible.builtin.include_tasks: haarlem_suite.yml
+  tags: haarlem_suite
+
+# ... Eventuele resterende taken ...

@@ -1,0 +1,99 @@
+# automations.yaml.j2
+# 1. VLIEGTUIGEN (Lawaai op 3-hoog)
+- alias: "Action: Schiphol Herrie 2037LL"
+  trigger:
+    - platform: geo_location
+      source: opensky
+      zone: zone.home
+      event: enter
+  condition:
+    - condition: template
+      value_template: "{% raw %}{{ trigger.to_state.attributes.altitude < 850 }}{% endraw %}"
+  action:
+    - service: notify.gotify
+      data:
+        title: "✈️ Vliegtuig Laag Over!"
+        message: "Vlucht {{ '{{' }} trigger.to_state.attributes.callsign {{ '}}' }} op {{ '{{' }} trigger.to_state.attributes.altitude {{ '}}' }}m."
+        priority: 4
+
+# 2. WIND (Balkon West-zijde)
+- alias: "Action: Wind Alert 3-Hoog"
+  trigger:
+    - platform: numeric_state
+      entity_id: weather.knmi_haarlem
+      attribute: wind_speed
+      above: 35
+  condition:
+    - condition: numeric_state
+      entity_id: weather.knmi_haarlem
+      attribute: wind_bearing
+      above: 180
+      below: 320
+  action:
+    - service: notify.gotify
+      data:
+        title: "🌬️ Wind op Balkon"
+        message: "Harde westenwind! Check je spullen op 3-hoog."
+        priority: 6
+
+# 3. VEILIGHEID (P2000 Postcode Check)
+- alias: "Action: P2000 Nabijheid"
+  trigger:
+    - platform: state
+      entity_id: sensor.p2000_regio_12
+  condition:
+    - condition: template
+      value_template: "{% raw %}{{ '{% endraw %}{{ vault_postcode }}{% raw %}' in trigger.to_state.attributes.message }}{% endraw %}"
+  action:
+    - service: notify.gotify
+      data:
+        title: "🚨 Melding bij Flat"
+        message: "{% raw %}{{ trigger.to_state.attributes.message }}{% endraw %}"
+        priority: 8
+
+# 4. TATA STEEL (Luchtkwaliteit)
+- alias: "Action: Tata Steel Alert"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.luchtkwaliteit_schalkwijk
+      above: 25
+  condition:
+    - condition: numeric_state
+      entity_id: weather.knmi_haarlem
+      attribute: wind_bearing
+      above: 285
+      below: 335
+  action:
+    - service: notify.gotify
+      data:
+        title: "😷 Slechte Lucht"
+        message: "Wind uit NW (Tata Steel). Sluit je roosters."
+        priority: 5
+
+# 5. ENERGIE (Henry's Dynamische Logica)
+- alias: "Action: Energie Prijs Melding"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.energie_goedkoopste_uur
+      to: 'on'
+  action:
+    - service: notify.gotify
+      data:
+        title: "⚡ Laagste Prijs Nu!"
+        message: "Stroom is op z'n allergoedkoopst vandaag. Start de was!"
+        priority: 3
+
+# 6. OVERHEID & AMBER ALERTS (Kritiek)
+- alias: "Action: Amber Alert Melding"
+  trigger:
+    - platform: event
+      event_type: feedreader
+  condition:
+    - condition: template
+      value_template: "{{ '{{' }} 'AMBER' in trigger.event.data.title or 'Amber' in trigger.event.data.title {{ '}}' }}"
+  action:
+    - service: notify.gotify
+      data:
+        title: "🆘 AMBER ALERT"
+        message: "{{ '{{' }} trigger.event.data.title {{ '}}' }}"
+        priority: 10

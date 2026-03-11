@@ -1,0 +1,54 @@
+# roles/home_assistant/tasks/main.yml
+---
+- name: "HACS: Installatie"
+  ansible.builtin.shell:
+    cmd: "wget -O - https://get.hacs.xyz | bash -"
+    chdir: "{{ ha_config_dir }}"
+    creates: "{{ ha_config_dir }}/custom_components/hacs/manifest.json"
+
+- name: "Haarlem Suite: Download Custom Components (Git)"
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ ha_config_dir }}/custom_components/{{ item.name }}"
+  loop:
+    - { name: 'knmi', repo: 'https://github.com/vanderwarker/home-assistant-knmi.git' }
+    - { name: 'p2000', repo: 'https://github.com/cyberjunky/home-assistant-p2000.git' }
+
+- name: "Config: Hoofdconfiguratie met RSS Feeds"
+  ansible.builtin.blockinfile:
+    path: "{{ ha_config_dir }}/configuration.yaml"
+    marker: "# {mark} ANSIBLE 2037LL FULL SUITE #"
+    block: |
+      homeassistant:
+        packages: !include_dir_named packages
+
+      # Overheid & Amber Alerts
+      feedreader:
+        urls:
+          - https://www.politie.nl/rss/amber-alerts.xml
+        scan_interval: 60
+
+      # Omgevingssensoren
+      sensor:
+        - platform: opensky
+          radius: 3
+          latitude: {{ vault_home_lat }}
+          longitude: {{ vault_home_lon }}
+        - platform: p2000
+          regio: 12
+          postcodes: {{ vault_postcode }}
+        - platform: rest
+          name: "Luchtkwaliteit_Schalkwijk"
+          resource: "https://api.luchtmeetnet.nl/open_api/stations/NL01488/measurements?formula=PM25"
+          value_template: "{% raw %}{{ value_json.data[0].value }}{% endraw %}"
+
+- name: "Energy: Push Henry's Orchestrator"
+  ansible.builtin.template:
+    src: energy_orchestrator.yaml.j2
+    dest: "{{ ha_config_dir }}/packages/energy_orchestrator.yaml"
+
+- name: "Automations: Push Volledige Haarlem Alerts"
+  ansible.builtin.template:
+    src: automations.yaml.j2
+    dest: "{{ ha_config_dir }}/automations.yaml"
+  notify: "Restart Home Assistant"
