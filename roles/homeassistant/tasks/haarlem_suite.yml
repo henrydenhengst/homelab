@@ -1,4 +1,4 @@
-# roles/home_assistant/tasks/main.yml
+# roles/homeassistant/tasks/main.yml
 ---
 - name: "HACS: Installatie"
   ansible.builtin.shell:
@@ -11,7 +11,7 @@
     repo: "{{ item.repo }}"
     dest: "{{ ha_config_dir }}/custom_components/{{ item.name }}"
   loop:
-    - { name: 'knmi', repo: 'https://github.com/vanderwarker/home-assistant-knmi.git' }
+    # - { name: 'knmi', repo: 'https://github.com/vanderwarker/home-assistant-knmi.git' } # Deze repo bestaat niet (meer)
     - { name: 'p2000', repo: 'https://github.com/cyberjunky/home-assistant-p2000.git' }
 
 - name: "Config: Hoofdconfiguratie met RSS Feeds"
@@ -41,11 +41,6 @@
           name: "Luchtkwaliteit_Schalkwijk"
           resource: "https://api.luchtmeetnet.nl/open_api/stations/NL01488/measurements?formula=PM25"
           value_template: "{% raw %}{{ value_json.data[0].value }}{% endraw %}"
-
-- name: "Energy: Push Henry's Orchestrator"
-  ansible.builtin.template:
-    src: energy_orchestrator.yaml.j2
-    dest: "{{ ha_config_dir }}/packages/energy_orchestrator.yaml"
 
 - name: "Automations: Push Volledige Haarlem Alerts"
   ansible.builtin.template:

@@ -1,23 +1,28 @@
+# Default configuration
 default_config:
 
+# HTTP & trusted proxies
 http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
-    - 172.16.0.0/12  # Dit dekt de meeste Docker netwerken
+    - 172.16.0.0/12  # Docker network range
+    - 192.168.0.0/16 # Optioneel: je lokale netwerk
 
+# Database
 recorder:
-  # Hostnaam aangepast van 'postgres' naar 'postgres_db'
   db_url: postgresql://homeassistant:{{ vault_postgres_password }}@postgres_db/homeassistant
   purge_keep_days: 30
+  commit_interval: 30
 
-mqtt:
-  broker: mosquitto
-  discovery: true
-
+# Home Assistant core
 homeassistant:
   name: "Henry's Homelab"
   time_zone: "Europe/Amsterdam"
-  # Volledige URL incl. jouw DuckDNS naam:
   external_url: "https://{{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }}"
   internal_url: "http://homeassistant:8123"
+
+# MQTT - UITGE COMMENTAAR (via UI instellen)
+# mqtt:
+#   broker: mosquitto
+#   discovery: true

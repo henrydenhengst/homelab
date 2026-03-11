@@ -1,0 +1,6 @@
+---
+- name: "Restart Home Assistant"
+  community.docker.docker_container:
+    name: "{{ ha_container_name | default('homeassistant') }}"
+    restart: yes
+    state: started
