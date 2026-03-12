@@ -542,10 +542,63 @@ If these three apps are on your phone and you can log in, your system is ready t
   - No login, no setup, no database
 
 ## 7. Security
-- Security Features Explained
-- Verification Steps
-- Hardening Details
-- Best Practices
+- ### Security Features Explained
+- ### Verification Steps
+- ### Hardening Details
+- ### 🔐 Optional System Hardening (Lynis Score Booster)
+  After the base installation, you can further strengthen your server's security by running the dedicated hardening playbook. This will significantly improve your Lynis security audit score.
+
+  #### What it does
+
+  The `lynis_hardening.yml` playbook automates several essential security measures:
+
+  | Component | Action |
+  |-----------|--------|
+  | **SSH** | Changes to an obscure port (59612), disables root login, enforces key-based authentication, and applies multiple hardening settings |
+  | **Kernel** | Optimizes 16+ sysctl parameters for better security (IP forwarding, SYN cookies, source routing, etc.) |
+  | **Firewall** | Configures UFW to only allow the new SSH port with rate limiting, blocks port 22 |
+  | **Rootkit scanners** | Installs and configures rkhunter, chkrootkit, AIDE, and ClamAV |
+  | **Fail2ban** | Updates SSH jail to monitor the new port |
+  | **Lynis audit** | Runs a final security scan to show your improved hardening score |
+
+  #### Prerequisites
+
+  - Your homelab server must be reachable via SSH
+  - You have Ansible installed on your control machine
+  - You have the vault password ready (if using encrypted secrets)
+
+  #### How to run
+
+  ```bash
+  # First, do a dry-run to see what will change
+  ansible-playbook playbooks/lynis_hardening.yml --check --ask-vault-pass
+
+  # Then run the actual hardening (this will modify your system!)
+  ansible-playbook playbooks/lynis_hardening.yml --ask-vault-pass
+  ```
+
+  #### ⚠️ Important notes
+  Keep your current SSH session open until you've verified the new one works
+
+  After the playbook completes, test the new SSH connection in a separate terminal:
+  ```bash
+  ssh -p 59612 henry@192.168.178.2
+  ```
+  
+  If you have an existing SSH configuration on your client, update it to use the new port:
+  ```bash  
+  # Add to ~/.ssh/config
+  Host homelab
+    HostName 192.168.178.2
+    Port 59612
+    User <you>
+  ```
+
+  #### Expected result
+  After a successful run, your Lynis hardening index should increase from around 66 to 80+. The playbook will display your new score at the end.
+
+
+- ## Best Practices
 
 ### 8. Integration & Extension
 - Adding Custom Services
