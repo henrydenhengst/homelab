@@ -1,10 +1,70 @@
+---
+# ==============================================================================
+# TECHNISCHE CONFIGURATIE (NIET-GEHEIM)
+# ==============================================================================
+
+# --- Systeem & Netwerk ---
+timezone: "Europe/Amsterdam"
+domain: "duckdns.org"
 docker_base_path: "/opt/docker"
 docker_network_name: "t2_network"
-domain: "duckdns.org"
-timezone: "Europe/Amsterdam"
-zigbee_subdomain: "zigbee"
-ha_subdomain: "homeassistant"
-portainer_subdomain: "portainer"
+docker_network_range: "172.16.0.0/12"
+local_network_range: "192.168.0.0/16"
 
-# Systeem check instellingen
+# --- Paden ---
+ha_config_dir: "{{ docker_base_path }}/homeassistant"
+rclone_log: "/var/log/rclone.log"
+
+# --- Dashboard & UI Layout ---
+flame_theme: "dark"
 log_filter_exclude: "kex_exchange_identification|AnotherMessageToIgnore"
+
+# --- Container Images & Versies ---
+image_caddy: "serfriz/caddy-duckdns:latest"
+image_homeassistant: "ghcr.io/home-assistant/home-assistant:stable"
+image_zigbee2mqtt: "koenkk/zigbee2mqtt:latest"
+image_zwavejs: "zwavejs/zwavejs2mqtt:latest"
+image_esphome: "ghcr.io/esphome/esphome:latest"
+image_mosquitto: "eclipse-mosquitto:latest"
+image_postgres: "postgres:16-alpine"
+image_vaultwarden: "vaultwarden/server:latest"
+image_portainer: "portainer/portainer-ce:latest"
+image_flame: "pawelmalak/flame:latest"
+image_gotify: "gotify/server:latest"
+image_matter: "ghcr.io/home-assistant-libs/python-matter-server:stable"
+image_rtl433: "hertzg/rtl_433:latest"
+
+# --- Poort Configuratie ---
+port_http: 80
+port_https: 443
+port_ha: 8123
+port_mqtt: 1883
+port_mqtt_web: 9001
+port_z2m: 8080
+port_zwave: 8091
+port_postgres: 5432
+port_esphome: 6052
+port_flame: 5005
+port_portainer: 9000
+port_vaultwarden: 80
+port_gotify: 80     # Toegevoegd: de interne poort voor Gotify
+
+# --- Containernamen (voor interne DNS / Caddy) ---
+name_ha: "homeassistant"
+name_flame: "flame"
+name_zigbee2mqtt: "zigbee2mqtt"
+name_vaultwarden: "vaultwarden"
+name_portainer: "portainer"
+name_esphome: "esphome"
+name_gotify: "gotify"
+name_mosquitto: "mosquitto"
+
+# --- Subdomeinen (Caddy Routeering) ---
+ha_subdomain: "ha"
+zigbee_subdomain: "zigbee"
+esphome_subdomain: "esphome"
+mqtt_subdomain: "mqtt"
+vault_subdomain: "vault"
+portainer_subdomain: "portainer"
+gotify_subdomain: "gotify"
+flame_subdomain: "denhengst"
