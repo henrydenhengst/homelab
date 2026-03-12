@@ -1,0 +1,54 @@
+# check_homelab.yml
+---
+- name: Homelab Handmatige Check
+  hosts: homeassistant
+  become: yes
+  vars:
+    max_cpu_load: 2.0
+    max_ram_percent: 90
+    max_disk_percent: 85
+    iface: "eth0"
+    rclone_log: "/var/log/rclone.log" # Pas aan naar jouw pad uit de github repo
+
+  tasks:
+    - name: Metrics verzamelen
+      shell: |
+        load=$(cat /proc/loadavg | awk '{print $1}')
+        ram=$(free | awk '/Mem:/ {printf "%d", $3/$2 * 100}')
+        disk=$(df / --output=pcent | tail -1 | tr -dc '0-9')
+        echo "$load $ram $disk"
+      register: sys_perf
+      changed_when: false
+
+    - name: Check gestopte containers
+      shell: "docker ps -a --filter 'status=exited' --format '{ { .Names } }'"
+      register: failed_containers
+      changed_when: false
+
+    - name: Check Sync Logs (Rclone/Rsync)
+      shell: "grep -Ei 'error|failed|fatal' {{ rclone_log }} | tail -n 3"
+      register: sync_errors
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Check Systeem Errors (laatste uur)
+      shell: "journalctl --since '1h ago' -p err | wc -l"
+      register: log_err_count
+      changed_when: false
+
+    - name: "--- RAPPORTAGE ---"
+      debug:
+        msg: >
+          {% set alerts = [] %}
+          {% if sys_perf.stdout.split()[0] | float > max_cpu_load %}{% set _ = alerts.append('CPU Load te hoog') %}{% endif %}
+          {% if sys_perf.stdout.split()[1] | int > max_ram_percent %}{% set _ = alerts.append('RAM bijna vol') %}{% endif %}
+          {% if sys_perf.stdout.split()[2] | int > max_disk_percent %}{% set _ = alerts.append('Disk bijna vol') %}{% endif %}
+          {% if failed_containers.stdout != '' %}{% set _ = alerts.append('Containers gestopt: ' ~ failed_containers.stdout) %}{% endif %}
+          {% if sync_errors.stdout != '' %}{% set _ = alerts.append('Sync fouten gevonden') %}{% endif %}
+          {% if log_err_count.stdout | int > 0 %}{% set _ = alerts.append('Systeem errors gevonden') %}{% endif %}
+          
+          {% if alerts | length > 0 %}
+          WAARSCHUWING: {{ alerts | join(', ') }}
+          {% else %}
+          Alles Goed !
+          {% endif %}

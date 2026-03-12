@@ -1,0 +1,65 @@
+# backup_check.yml
+---
+- name: Homelab Backup en Gezondheidscheck
+  hosts: homeassistant
+  become: yes
+  vars:
+    # Paden gebaseerd op je homelab structuur
+    source_dir: "/opt/homelab"
+    backup_dest: "/mnt/backup_schijf/homelab_backup"
+    rclone_config_name: "myremote"
+    max_disk_percent: 85
+    rclone_log: "/var/log/rclone.log"
+
+  tasks:
+    # --- DEEL 1: DE BACKUP ---
+    - name: "Backup: Rsync naar lokale backup schijf"
+      ansible.posix.synchronize:
+        src: "{{ source_dir }}"
+        dest: "{{ backup_dest }}"
+        delete: yes
+        recursive: yes
+      register: rsync_result
+
+    - name: "Backup: Rclone naar de Cloud (optioneel)"
+      shell: "rclone sync {{ backup_dest }} {{ rclone_config_name }}:backup --log-file={{ rclone_log }}"
+      register: rclone_result
+      ignore_errors: yes
+
+    # --- DEEL 2: DE CONTROLES ---
+    - name: Systeem metrics ophalen
+      shell: |
+        load=$(cat /proc/loadavg | awk '{print $1}')
+        ram=$(free | awk '/Mem:/ {printf "%d", $3/$2 * 100}')
+        disk=$(df / --output=pcent | tail -1 | tr -dc '0-9')
+        echo "$load $ram $disk"
+      register: sys_perf
+      changed_when: false
+
+    - name: Check of alle containers draaien
+      shell: "docker ps -a --filter 'status=exited' --format '{ { .Names } }'"
+      register: failed_containers
+      changed_when: false
+
+    - name: Scan Rclone log op fouten
+      shell: "grep -Ei 'error|failed|fatal' {{ rclone_log }} | tail -n 1"
+      register: sync_errors
+      ignore_errors: yes
+      changed_when: false
+
+    # --- DEEL 3: HET EINDRAPPORT ---
+    - name: "RESULTAAT"
+      debug:
+        msg: >
+          {% set alerts = [] %}
+          {% if rsync_result.failed %}{% set _ = alerts.append('Rsync Backup mislukt') %}{% endif %}
+          {% if rclone_result.rc != 0 %}{% set _ = alerts.append('Rclone Sync mislukt') %}{% endif %}
+          {% if sys_perf.stdout.split()[2] | int > max_disk_percent %}{% set _ = alerts.append('Disk bijna vol') %}{% endif %}
+          {% if failed_containers.stdout != '' %}{% set _ = alerts.append('Containers gestopt: ' ~ failed_containers.stdout) %}{% endif %}
+          {% if sync_errors.stdout != '' %}{% set _ = alerts.append('Log errors in sync gevonden') %}{% endif %}
+          
+          {% if alerts | length > 0 %}
+          ER IS IETS MIS: {{ alerts | join(', ') }}
+          {% else %}
+          Alles Goed ! (Backup voltooid & Systeem gezond)
+          {% endif %}

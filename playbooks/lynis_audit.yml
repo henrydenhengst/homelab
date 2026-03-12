@@ -1,0 +1,64 @@
+# lynis_audit.yml
+# Nadat het playbook klaar is, 
+# staat er een bestand op de Ansible node 
+# in de map reports/.
+#
+# grep -E "warning\[\]|suggestion\[\]" reports/lynis-report-jeservernaam.dat
+#
+# overzichtelijk lijstje van de Warnings
+# (kritiek) en Suggestions (punten voor
+# verbetering) in je terminal.
+---
+- name: Lynis Installatie, Audit en Rapportage
+  hosts: servers
+  become: true
+  vars:
+    report_dir: "./reports"
+
+  tasks:
+    - name: Installeer Lynis
+      ansible.builtin.package:
+        name: lynis
+        state: present
+
+    - name: Draai Lynis systeem audit
+      ansible.builtin.command:
+        cmd: lynis audit system --quick
+      register: lynis_run
+      changed_when: true
+
+    - name: Haal Hardening Index op
+      ansible.builtin.shell: grep "hardening_index" /var/log/lynis-report.dat | cut -d'=' -f2
+      register: hardening_index
+      changed_when: false
+
+    - name: Haal Waarschuwingen en Suggesties op
+      ansible.builtin.shell: |
+        grep -E "warning\[\]|suggestion\[\]" /var/log/lynis-report.dat | cut -d'|' -f3,4 | sed 's/|/: /'
+      register: audit_details
+      changed_when: false
+
+    - name: Maak lokale rapportage map aan
+      ansible.builtin.file:
+        path: "{{ report_dir }}"
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+      become: false
+
+    - name: Kopieer rapport naar Ansible Node
+      ansible.builtin.fetch:
+        src: /var/log/lynis-report.dat
+        dest: "{{ report_dir }}/lynis-report-{{ inventory_hostname }}.dat"
+        flat: yes
+
+    - name: Overzicht Resultaten
+      ansible.builtin.debug:
+        msg: 
+          - "SERVER: {{ inventory_hostname }}"
+          - "HARDENING INDEX: {{ hardening_index.stdout }}"
+          - "------------------------------------------"
+          - "DETAILS:"
+          - "{{ audit_details.stdout_lines }}"
+
+
