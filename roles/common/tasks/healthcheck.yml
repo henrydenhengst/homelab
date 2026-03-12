@@ -1,5 +1,5 @@
 ---
-- name: "🚀 Henry's System Healthcheck"
+- name: "🚀 {{ vault_homelab_name }} Healthcheck"
   block:
     - name: 🐋 Controleer of kritieke Docker containers up-and-running zijn
       community.docker.docker_container_info:
@@ -35,7 +35,7 @@
 
     - name: 🦟 Test of de MQTT Broker (Mosquitto) luistert
       ansible.builtin.wait_for:
-        host: "172.21.0.6"
+        host: "{{ vault_server_ip }}"
         port: 1883
         timeout: 5
         msg: "⚠️ MQTT broker is niet bereikbaar op poort 1883!"
@@ -49,7 +49,7 @@
     - name: 🏁 Status Rapport
       ansible.builtin.debug:
         msg: 
-          - "Henry, je systeem is 100% 'Lean & Mean'!"
+          - "{{ main_user | capitalize }}, je systeem is 100% 'Lean & Mean'!"
           - "Containers: Operationeel 🟢"
           - "Hardware: USB Dongle gevonden 🟢"
           - "Database: Connectie via {{ active_pg_user.stdout }} OK 🟢"

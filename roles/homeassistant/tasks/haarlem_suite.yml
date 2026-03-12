@@ -32,11 +32,11 @@
       sensor:
         - platform: opensky
           radius: 3
-          latitude: {{ vault_home_lat }}
-          longitude: {{ vault_home_lon }}
+          latitude: "{{ vault_home_lat }}"
+          longitude: "{{ vault_home_lon }}"
         - platform: p2000
           regio: 12
-          postcodes: {{ vault_postcode }}
+          postcodes: "{{ vault_postcode }}"
         - platform: rest
           name: "Luchtkwaliteit_Schalkwijk"
           resource: "https://api.luchtmeetnet.nl/open_api/stations/NL01488/measurements?formula=PM25"

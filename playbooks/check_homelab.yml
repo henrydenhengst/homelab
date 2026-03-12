@@ -1,14 +1,13 @@
-# check_homelab.yml
 ---
 - name: Homelab Handmatige Check
   hosts: all
   become: yes
   vars:
+    # Fallback waarden (worden overschreven door je vars.yml)
     max_cpu_load: 2.0
     max_ram_percent: 90
     max_disk_percent: 85
-    iface: "eth0"
-    rclone_log: "/var/log/rclone.log" # Pas aan naar jouw pad uit de github repo
+    log_filter_exclude: "kex_exchange_identification"
 
   tasks:
     - name: Metrics verzamelen
@@ -21,34 +20,59 @@
       changed_when: false
 
     - name: Check gestopte containers
-      shell: "docker ps -a --filter 'status=exited' --format '{ { .Names } }'"
+      shell: "docker ps -a --filter 'status=exited' --format '{{ '{{' }} .Names {{ '}}' }}'"
       register: failed_containers
       changed_when: false
 
-    - name: Check Sync Logs (Rclone/Rsync)
-      shell: "grep -Ei 'error|failed|fatal' {{ rclone_log }} | tail -n 3"
+    - name: Check Sync Logs
+      # Gebruikt de rclone_log variabele uit je vars.yml
+      shell: "grep -Ei 'error|failed|fatal' {{ rclone_log | default('/var/log/rclone.log') }} | tail -n 3"
       register: sync_errors
       ignore_errors: yes
       changed_when: false
 
-    - name: Check Systeem Errors (laatste uur)
-      shell: "journalctl --since '1h ago' -p err | wc -l"
-      register: log_err_count
+    - name: Haal Systeem Errors op (voor details)
+      # Filtert de ruis weg die je in vars.yml definieert
+      shell: "journalctl --since '1h ago' -p err --no-pager | grep -vE '{{ log_filter_exclude }}' | tail -n 5"
+      register: log_details
+      failed_when: false
       changed_when: false
 
     - name: "--- RAPPORTAGE ---"
       debug:
-        msg: >
+        msg: |
+          REPORT VOOR: {{ vault_homelab_name | default(ansible_hostname) }}
+          -------------------------------------------------------
+          {% set perf = sys_perf.stdout.split() %}
           {% set alerts = [] %}
-          {% if sys_perf.stdout.split()[0] | float > max_cpu_load %}{% set _ = alerts.append('CPU Load te hoog') %}{% endif %}
-          {% if sys_perf.stdout.split()[1] | int > max_ram_percent %}{% set _ = alerts.append('RAM bijna vol') %}{% endif %}
-          {% if sys_perf.stdout.split()[2] | int > max_disk_percent %}{% set _ = alerts.append('Disk bijna vol') %}{% endif %}
-          {% if failed_containers.stdout != '' %}{% set _ = alerts.append('Containers gestopt: ' ~ failed_containers.stdout) %}{% endif %}
-          {% if sync_errors.stdout != '' %}{% set _ = alerts.append('Sync fouten gevonden') %}{% endif %}
-          {% if log_err_count.stdout | int > 0 %}{% set _ = alerts.append('Systeem errors gevonden') %}{% endif %}
+          
+          {% if perf[0] | float > max_cpu_load %}{% set _ = alerts.append('CPU Load: ' ~ perf[0]) %}{% endif %}
+          {% if perf[1] | int > max_ram_percent %}{% set _ = alerts.append('RAM vol: ' ~ perf[1] ~ '%') %}{% endif %}
+          {% if perf[2] | int > max_disk_percent %}{% set _ = alerts.append('Disk vol: ' ~ perf[2] ~ '%') %}{% endif %}
+          
+          STATUS:
+          {% if alerts | length == 0 and failed_containers.stdout == '' and log_details.stdout == '' %}
+          ✅ 100% LEAN & MEAN
+          {% else %}
+          ⚠️  AANDACHTSPUNTEN GEVONDEN:
           
           {% if alerts | length > 0 %}
-          WAARSCHUWING: {{ alerts | join(', ') }}
-          {% else %}
-          Alles Goed !
+          [!] Systeem Resources: {{ alerts | join(' | ') }}
           {% endif %}
+          
+          {% if failed_containers.stdout != '' %}
+          [!] Gestopte Containers: 
+          {{ failed_containers.stdout }}
+          {% endif %}
+          
+          {% if log_details.stdout != '' %}
+          [!] Laatste Systeem Errors (gefilterd):
+          {{ log_details.stdout }}
+          {% endif %}
+          
+          {% if sync_errors.stdout != '' %}
+          [!] Laatste Sync Fouten:
+          {{ sync_errors.stdout }}
+          {% endif %}
+          {% endif %}
+          -------------------------------------------------------

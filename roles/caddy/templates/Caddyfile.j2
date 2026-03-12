@@ -3,73 +3,71 @@
     email admin@{{ duckdns_domain }}.{{ domain }}
 }
 
-# Macro voor de DNS-01 challenge via DuckDNS API
+# Macro's blijven hetzelfde (die zijn al top)
 (duckdns_auth) {
     tls {
         dns duckdns {env.DUCKDNS_TOKEN}
     }
 }
 
-# Macro voor Basic Auth (beveiliging voor open dashboards)
 (basic_auth) {
     basicauth {
         {{ caddy_admin_user }} {{ caddy_admin_password_hash }}
     }
 }
 
-# 1. Home Assistant (Heeft eigen login)
+# 1. Home Assistant
 {{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
-    reverse_proxy homeassistant:8123
+    reverse_proxy {{ name_ha }}:{{ port_ha }}
 }
 
-# 2. Hoofddomein (Flame Dashboard - NU BEVEILIGD)
+# 2. Hoofddomein (Flame Dashboard)
 {{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     import basic_auth
-    reverse_proxy flame:5005
+    reverse_proxy {{ name_flame }}:{{ port_flame }}
 }
 
-# 3. Zigbee2MQTT (NU BEVEILIGD)
+# 3. Zigbee2MQTT
 {{ zigbee_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     import basic_auth
-    reverse_proxy zigbee2mqtt:8080
+    reverse_proxy {{ name_zigbee2mqtt }}:{{ port_z2m }}
 }
 
-# 4. Vaultwarden (Heeft eigen login)
+# 4. Vaultwarden
 {{ vault_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
-    reverse_proxy vaultwarden:80
+    reverse_proxy {{ name_vaultwarden }}:{{ port_vaultwarden }}
 }
 
-# 5. Portainer (Heeft eigen login)
+# 5. Portainer
 {{ portainer_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
-    reverse_proxy portainer:9000
+    reverse_proxy {{ name_portainer }}:{{ port_portainer }}
 }
 
-# 6. ESPHome (NU BEVEILIGD)
+# 6. ESPHome
 {{ esphome_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     import basic_auth
-    reverse_proxy esphome:6052
+    reverse_proxy {{ name_esphome }}:{{ port_esphome }}
 }
 
-# 7. Gotify (Notificatie server - Heeft eigen login)
+# 7. Gotify
 {{ gotify_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
-    reverse_proxy gotify:80
+    reverse_proxy {{ name_gotify }}:{{ port_gotify }}
 }
 
-# 8. Mosquitto (MQTT via WebSockets - Reeds beveiligd)
+# 8. Mosquitto (MQTT via WebSockets)
 {{ mqtt_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     
-    # Extra Basic Auth beveiliging voor MQTT WebSockets
     basicauth {
         admin {{ mqtt_admin_hash }}
     }
 
-    reverse_proxy mosquitto:9001
+    reverse_proxy {{ name_mosquitto }}:{{ port_mqtt_web }}
 }

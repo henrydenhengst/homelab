@@ -27,7 +27,7 @@
 - name: Start Home Assistant container
   community.docker.docker_container:
     name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:stable
+    image: "{{ image_homeassistant }}"
     state: started
     restart_policy: unless-stopped
     networks:
@@ -38,11 +38,11 @@
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     env:
-      TZ: "Europe/Amsterdam"
+      TZ: "{{ timezone }}"
     published_ports:
       - "8123:8123"
 
-# ... Bestaande taken van Henry ...
+# ... Bestaande taken van {{ main_user | capitalize }} ...
 
 - name: "Haarlem 2037LL: Activeer specifieke sensoren en alerts"
   ansible.builtin.include_tasks: haarlem_suite.yml

@@ -8,7 +8,7 @@
 - name: Start Portainer container
   docker_container:
     name: portainer
-    image: portainer/portainer-ce:latest
+    image: "{{ image_portainer }}"
     state: started
     restart_policy: unless-stopped
     networks:

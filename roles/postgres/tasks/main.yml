@@ -10,7 +10,7 @@
 - name: Start PostgreSQL container
   docker_container:
     name: postgres_db
-    image: postgres:16-alpine
+    image: "{{ image_postgres }}"
     state: started
     restart_policy: unless-stopped
     networks:

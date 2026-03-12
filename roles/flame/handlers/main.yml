@@ -2,6 +2,6 @@
 - name: Restart Flame
   docker_container:
     name: flame
-    image: pawelmalak/flame:latest
+    image: "{{ image_flame }}"
     state: started
     restart: yes

@@ -21,7 +21,7 @@
 - name: START ZIGBEE2MQTT
   docker_container:
     name: zigbee2mqtt
-    image: koenkk/zigbee2mqtt:latest
+    image: "{{ image_zigbee2mqtt }}"
     state: started
     restart_policy: always
     privileged: true

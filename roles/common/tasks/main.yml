@@ -1,7 +1,7 @@
 ---
 # ===============================================================
 # UNIVERSAL HEADLESS HARDENING & CLEANUP (DEBIAN, REDHAT, ARCH)
-# De Henry-standaard voor een Lean & Mean server - Versie 1.1
+# De {{ main_user | capitalize }}-standaard voor een Lean & Mean server - Versie 1.1
 # ===============================================================
 
 # 1️⃣ Variabelen definiëren op basis van OS-familie

@@ -6,7 +6,7 @@
     # --- CONFIGURATIE (Pas dit aan) ---
     ha_host_config_dir: "/opt/homeassistant/config"
     ha_container_name: "homeassistant"
-    gotify_url: "http://192.168.1.10:8080"
+    gotify_url: "{{ vault_gotify_url }}"
     gotify_token: "JOUW_GOTIFY_APP_TOKEN"
     price_threshold: 0.15  # Alleen melding als de dalprijs onder de 15 cent is
 

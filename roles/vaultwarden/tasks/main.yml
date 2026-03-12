@@ -15,7 +15,7 @@
 - name: Start Vaultwarden container
   community.docker.docker_container:
     name: vaultwarden
-    image: vaultwarden/server:latest
+    image: "{{ image_vaultwarden }}"
     restart_policy: always
     networks:
       - name: "{{ docker_network_name }}"

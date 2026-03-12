@@ -8,7 +8,7 @@
 - name: Start ESPHome container
   docker_container:
     name: esphome
-    image: ghcr.io/esphome/esphome:latest
+    image: "{{ image_esphome }}"
     restart_policy: unless-stopped
     state: started
     networks:
@@ -20,4 +20,4 @@
       - "{{ docker_base_path }}/esphome:/config"
       - /etc/localtime:/etc/localtime:ro
     env:
-      TZ: "Europe/Amsterdam"
+      TZ: "{{ timezone }}"

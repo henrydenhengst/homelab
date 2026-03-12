@@ -52,7 +52,7 @@
     mode: '0644'
     content: |
       app:
-        name: "{{ flame_dashboard_name | default('Henry Homelab') }}"
+        name: "{{ flame_dashboard_name | default(vault_homelab_name) }}"
         theme: "dark"
       search:
         enabled: true
@@ -67,7 +67,7 @@
 - name: Start Flame Dashboard container
   docker_container:
     name: flame
-    image: pawelmalak/flame:latest
+    image: "{{ image_flame }}"
     state: started
     restart_policy: unless-stopped
     # HIER GEBEURT DE MAGIE:

@@ -10,7 +10,7 @@
 - name: START GOTIFY
   community.docker.docker_container:
     name: gotify
-    image: gotify/server:latest
+    image: "{{ image_gotify }}"
     state: started
     restart_policy: always
     pull: yes

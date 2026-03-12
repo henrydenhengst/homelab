@@ -2,6 +2,6 @@
 - name: Restart Caddy
   docker_container:
     name: caddy
-    image: caddy:latest
+    image: "{{ image_caddy }}"
     state: started
     restart: yes

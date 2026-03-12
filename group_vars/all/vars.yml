@@ -5,3 +5,6 @@ timezone: "Europe/Amsterdam"
 zigbee_subdomain: "zigbee"
 ha_subdomain: "homeassistant"
 portainer_subdomain: "portainer"
+
+# Systeem check instellingen
+log_filter_exclude: "kex_exchange_identification|AnotherMessageToIgnore"

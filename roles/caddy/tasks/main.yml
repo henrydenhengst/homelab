@@ -18,7 +18,7 @@
 - name: Start Caddy container (DNS Challenge Mode)
   docker_container:
     name: caddy
-    image: serfriz/caddy-duckdns:latest
+    image: "{{ image_caddy }}"
     state: started
     restart_policy: unless-stopped
     networks:

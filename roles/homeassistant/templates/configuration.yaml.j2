@@ -6,8 +6,8 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
-    - 172.16.0.0/12  # Docker network range
-    - 192.168.0.0/16 # Optioneel: je lokale netwerk
+    - {{ docker_network_range }}  # Docker network range
+    - {{ local_network_range }} # Optioneel: je lokale netwerk
 
 # Database
 recorder:
@@ -17,8 +17,8 @@ recorder:
 
 # Home Assistant core
 homeassistant:
-  name: "Henry's Homelab"
-  time_zone: "Europe/Amsterdam"
+  name: "{{ vault_homelab_name }}"
+  time_zone: "{{ timezone }}"
   external_url: "https://{{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }}"
   internal_url: "http://homeassistant:8123"
 

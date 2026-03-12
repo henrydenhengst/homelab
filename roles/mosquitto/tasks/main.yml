@@ -27,7 +27,7 @@
 - name: Start Mosquitto container
   docker_container:
     name: mosquitto
-    image: eclipse-mosquitto:latest
+    image: "{{ image_mosquitto }}"
     restart_policy: always
     state: started
     recreate: yes

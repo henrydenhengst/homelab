@@ -8,7 +8,7 @@
 - name: Start Z-Wave JS UI container
   docker_container:
     name: zwavejsui
-    image: zwavejs/zwavejs2mqtt:latest
+    image: "{{ image_zwavejs }}"
     restart_policy: unless-stopped
     state: started
     published_ports:
@@ -21,5 +21,5 @@
     networks:
       - name: t2_network
     env:
-      TZ: "Europe/Amsterdam"
+      TZ: "{{ timezone }}"
   when: zwave_device is defined # <--- De magie: hij doet pas iets als de stick er is

@@ -2,7 +2,7 @@
 - name: Start RTL_433 naar MQTT bridge
   docker_container:
     name: rtl_433
-    image: hertzg/rtl_433:latest
+    image: "{{ image_rtl433 }}"
     restart_policy: unless-stopped
     devices:
       - "{{ rf_sdr_device }}:/dev/bus/usb/001/002" # Voorbeeld pad

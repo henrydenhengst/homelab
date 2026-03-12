@@ -22,7 +22,7 @@
     # --- CONFIGURATION ---
     ha_host_config_dir: "/opt/homeassistant/config"
     ha_container_name: "homeassistant"
-    gotify_url: "http://192.168.1.10:8080"
+    gotify_url: "{{ vault_gotify_url }}"
     gotify_token: "YOUR_GOTIFY_TOKEN"
     entsoe_token: "YOUR_ENTSOE_API_TOKEN"
     price_threshold: 0.15
