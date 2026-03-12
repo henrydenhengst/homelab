@@ -1,6 +1,6 @@
 ---
 - name: "Home Assistant & Gotify: Daluren Manager"
-  hosts: docker_host
+  hosts: all
   become: yes
   vars:
     # --- CONFIGURATIE (Pas dit aan) ---

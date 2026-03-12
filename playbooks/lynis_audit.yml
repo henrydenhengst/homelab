@@ -10,7 +10,7 @@
 # verbetering) in je terminal.
 ---
 - name: Lynis Installatie, Audit en Rapportage
-  hosts: servers
+  hosts: all
   become: true
   vars:
     report_dir: "./reports"

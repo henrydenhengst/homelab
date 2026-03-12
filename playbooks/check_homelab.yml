@@ -1,7 +1,7 @@
 # check_homelab.yml
 ---
 - name: Homelab Handmatige Check
-  hosts: homeassistant
+  hosts: all
   become: yes
   vars:
     max_cpu_load: 2.0

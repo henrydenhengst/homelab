@@ -1,7 +1,7 @@
 # backup_check.yml
 ---
 - name: Homelab Backup en Gezondheidscheck
-  hosts: homeassistant
+  hosts: all
   become: yes
   vars:
     # Paden gebaseerd op je homelab structuur

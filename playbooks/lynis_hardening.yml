@@ -1,0 +1,145 @@
+# playbooks/lynis_hardening.yml
+---
+- name: "🔐 Lynis Hardening - Automatische beveiliging"
+  hosts: all
+  become: yes
+  vars:
+    ssh_port: 2222  # Kies een niet-standaard poort
+    target_hardening_score: 80
+
+  tasks:
+    # --- DEEL 1: SSH HARDENING ---
+    - name: "SSH: Backup origineel configuratiebestand"
+      copy:
+        src: /etc/ssh/sshd_config
+        dest: /etc/ssh/sshd_config.backup-{{ ansible_date_time.date }}
+        remote_src: yes
+        owner: root
+        group: root
+        mode: '0600'
+      when: ssh_backup is not defined
+
+    - name: "SSH: Hardening instellingen toepassen"
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        backup: yes
+      loop:
+        - { regexp: '^#?Port', line: 'Port {{ ssh_port }}' }
+        - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
+        - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+        - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+        - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
+        - { regexp: '^#?MaxSessions', line: 'MaxSessions 2' }
+        - { regexp: '^#?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
+        - { regexp: '^#?ClientAliveInterval', line: 'ClientAliveInterval 300' }
+        - { regexp: '^#?AllowTcpForwarding', line: 'AllowTcpForwarding no' }
+        - { regexp: '^#?X11Forwarding', line: 'X11Forwarding no' }
+        - { regexp: '^#?AllowAgentForwarding', line: 'AllowAgentForwarding no' }
+        - { regexp: '^#?LogLevel', line: 'LogLevel VERBOSE' }
+        - { regexp: '^#?Compression', line: 'Compression no' }
+        - { regexp: '^#?TCPKeepAlive', line: 'TCPKeepAlive no' }
+      notify: restart ssh
+      register: ssh_changes
+
+    # --- DEEL 2: KERNEL HARDENING (sysctl) ---
+    - name: "Kernel: Hardening parameters toepassen"
+      sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: yes
+        sysctl_file: /etc/sysctl.d/99-hardening.conf
+      loop:
+        - { name: 'net.ipv4.ip_forward', value: '0' }
+        - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
+        - { name: 'net.ipv4.conf.default.rp_filter', value: '1' }
+        - { name: 'net.ipv4.tcp_syncookies', value: '1' }
+        - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
+        - { name: 'net.ipv4.conf.all.accept_source_route', value: '0' }
+        - { name: 'net.ipv6.conf.all.accept_source_route', value: '0' }
+        - { name: 'net.ipv4.conf.all.send_redirects', value: '0' }
+        - { name: 'net.ipv4.conf.default.send_redirects', value: '0' }
+        - { name: 'net.ipv4.tcp_timestamps', value: '0' }
+        - { name: 'net.ipv4.conf.all.log_martians', value: '1' }
+        - { name: 'kernel.randomize_va_space', value: '2' }
+        - { name: 'fs.suid_dumpable', value: '0' }
+        - { name: 'kernel.kptr_restrict', value: '1' }
+        - { name: 'kernel.dmesg_restrict', value: '1' }
+        - { name: 'kernel.printk', value: '3 3 3 3' }
+
+    # --- DEEL 3: ROOTKIT SCANNERS ---
+    - name: "Security: Installeer rootkit scanners"
+      apt:
+        name:
+          - rkhunter
+          - chkrootkit
+          - aide
+          - clamav
+          - clamav-daemon
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: "RKHunter: Update properties"
+      command: rkhunter --propupd
+      when: ansible_os_family == "Debian"
+
+    # --- DEEL 4: FIREWALL VERDER HARDENEN ---
+    - name: "UFW: Sta alleen SSH op nieuwe poort toe"
+      ufw:
+        rule: "{{ item.rule }}"
+        port: "{{ item.port }}"
+        proto: tcp
+      loop:
+        - { rule: 'allow', port: '{{ ssh_port }}' }
+        - { rule: 'deny', port: '22' }
+
+    - name: "UFW: Rate limiting voor SSH"
+      ufw:
+        rule: limit
+        port: "{{ ssh_port }}"
+        proto: tcp
+
+    # --- DEEL 5: FAIL2BAN OPTIMALISEREN ---
+    - name: "Fail2ban: SSH jail aanpassen voor nieuwe poort"
+      lineinfile:
+        path: /etc/fail2ban/jail.local
+        regexp: '^port\s*='
+        line: 'port = {{ ssh_port }}'
+        create: yes
+      notify: restart fail2ban
+
+    # --- DEEL 6: NIEUWE LYNS AUDIT NA HARDENING ---
+    - name: "Draai nieuwe Lynis audit na hardening"
+      command: "lynis audit system --quiet --no-colors"
+      register: lynis_after
+      changed_when: false
+      ignore_errors: yes
+
+    - name: "Haal nieuwe hardening index op"
+      shell: "lynis audit system --quiet --no-colors | grep 'Hardening index' | awk '{print $NF}'"
+      register: new_score
+      changed_when: false
+
+    - name: "Toon verbetering"
+      debug:
+        msg:
+          - "=========================================="
+          - "🔐 SSH poort gewijzigd naar: {{ ssh_port }}"
+          - "📊 Nieuwe hardening index: {{ new_score.stdout | default('onbekend') }}"
+          - "✅ Alle hardening maatregelen toegepast"
+          - "⚠️ Vergeet niet je SSH verbinding te testen op poort {{ ssh_port }}!"
+          - "=========================================="
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: sshd
+        state: restarted
+
+    - name: restart fail2ban
+      service:
+        name: fail2ban
+        state: restarted

@@ -1,6 +1,6 @@
 ---
 - name: "EU Universal Energy & Infra Manager"
-  hosts: docker_host
+  hosts: all
   become: yes
   vars:
     # =========================================================================
