@@ -1,32 +1,56 @@
 # playbooks/lynis_hardening.yml
 ---
-- name: "🔐 Lynis Hardening - Automatische beveiliging"
+- name: "🔐 Lynis Hardening - Volledige systeembeveiliging (met SSH-poort wijziging)"
   hosts: all
   become: yes
   vars:
-    ssh_port: 2222  # Kies een niet-standaard poort
+    # --- CONFIGURATIE (PAS HIER AAN) ---
+    ssh_port: 59612  # Jouw gekozen poort
+    backup_base: "/root/lynis_backups"
+    backup_dir: "{{ backup_base }}/{{ ansible_date_time.date }}"
     target_hardening_score: 80
 
   tasks:
-    # --- DEEL 1: SSH HARDENING ---
-    - name: "SSH: Backup origineel configuratiebestand"
-      copy:
+    # --- DEEL 0: BACKUP & VOORBEREIDING ---
+    - name: "Maak backup base directory aan"
+      ansible.builtin.file:
+        path: "{{ backup_base }}"
+        state: directory
+        mode: '0700'
+
+    - name: "Maak backup datum directory aan"
+      ansible.builtin.file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: '0700'
+
+    - name: "Backup originele SSH config (met direct pad)"
+      ansible.builtin.copy:
         src: /etc/ssh/sshd_config
-        dest: /etc/ssh/sshd_config.backup-{{ ansible_date_time.date }}
+        dest: "/root/lynis_backups/{{ ansible_date_time.date }}/sshd_config.orig"
         remote_src: yes
         owner: root
         group: root
         mode: '0600'
-      when: ssh_backup is not defined
+      register: ssh_backup_result
+      ignore_errors: yes  # Negeer fouten in check-mode
 
+    - name: "Backup originele UFW regels"
+      ansible.builtin.shell: "ufw status numbered > /root/lynis_backups/{{ ansible_date_time.date }}/ufw_status.orig"
+      changed_when: false
+      ignore_errors: yes
+      args:
+        creates: "/root/lynis_backups/{{ ansible_date_time.date }}/ufw_status.orig"
+
+    # --- DEEL 1: SSH HARDENING ---
     - name: "SSH: Hardening instellingen toepassen"
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         regexp: "{{ item.regexp }}"
         line: "{{ item.line }}"
         backup: yes
       loop:
-        - { regexp: '^#?Port', line: 'Port {{ ssh_port }}' }
+        - { regexp: '^#?Port', line: "Port {{ ssh_port }}" }
         - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
         - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
         - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
@@ -43,9 +67,15 @@
       notify: restart ssh
       register: ssh_changes
 
+    - name: "Controleer SSH config syntax"
+      ansible.builtin.command: sshd -t
+      register: sshd_test
+      changed_when: false
+      when: ssh_changes.changed
+
     # --- DEEL 2: KERNEL HARDENING (sysctl) ---
     - name: "Kernel: Hardening parameters toepassen"
-      sysctl:
+      ansible.posix.sysctl:
         name: "{{ item.name }}"
         value: "{{ item.value }}"
         state: present
@@ -71,7 +101,7 @@
 
     # --- DEEL 3: ROOTKIT SCANNERS ---
     - name: "Security: Installeer rootkit scanners"
-      apt:
+      ansible.builtin.apt:
         name:
           - rkhunter
           - chkrootkit
@@ -83,12 +113,12 @@
       when: ansible_os_family == "Debian"
 
     - name: "RKHunter: Update properties"
-      command: rkhunter --propupd
+      ansible.builtin.command: rkhunter --propupd
       when: ansible_os_family == "Debian"
 
     # --- DEEL 4: FIREWALL VERDER HARDENEN ---
-    - name: "UFW: Sta alleen SSH op nieuwe poort toe"
-      ufw:
+    - name: "UFW: Sta nieuwe SSH-poort toe"
+      community.general.ufw:
         rule: "{{ item.rule }}"
         port: "{{ item.port }}"
         proto: tcp
@@ -97,49 +127,51 @@
         - { rule: 'deny', port: '22' }
 
     - name: "UFW: Rate limiting voor SSH"
-      ufw:
+      community.general.ufw:
         rule: limit
         port: "{{ ssh_port }}"
         proto: tcp
 
     # --- DEEL 5: FAIL2BAN OPTIMALISEREN ---
     - name: "Fail2ban: SSH jail aanpassen voor nieuwe poort"
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/fail2ban/jail.local
         regexp: '^port\s*='
-        line: 'port = {{ ssh_port }}'
+        line: "port = {{ ssh_port }}"
         create: yes
       notify: restart fail2ban
+      when: ssh_port != 22
 
     # --- DEEL 6: NIEUWE LYNS AUDIT NA HARDENING ---
     - name: "Draai nieuwe Lynis audit na hardening"
-      command: "lynis audit system --quiet --no-colors"
+      ansible.builtin.command: "lynis audit system --quiet --no-colors"
       register: lynis_after
       changed_when: false
       ignore_errors: yes
 
     - name: "Haal nieuwe hardening index op"
-      shell: "lynis audit system --quiet --no-colors | grep 'Hardening index' | awk '{print $NF}'"
+      ansible.builtin.shell: "lynis audit system --quiet --no-colors | grep 'Hardening index' | awk '{print $NF}'"
       register: new_score
       changed_when: false
 
-    - name: "Toon verbetering"
-      debug:
+    - name: "Toon resultaten"
+      ansible.builtin.debug:
         msg:
           - "=========================================="
           - "🔐 SSH poort gewijzigd naar: {{ ssh_port }}"
+          - "🔥 UFW firewall geüpdatet voor poort {{ ssh_port }}"
           - "📊 Nieuwe hardening index: {{ new_score.stdout | default('onbekend') }}"
           - "✅ Alle hardening maatregelen toegepast"
-          - "⚠️ Vergeet niet je SSH verbinding te testen op poort {{ ssh_port }}!"
+          - "⚠️ Vergeet niet je SSH verbinding te testen: ssh -p {{ ssh_port }} {{ ansible_user }}@{{ inventory_hostname }}"
           - "=========================================="
 
   handlers:
     - name: restart ssh
-      service:
+      ansible.builtin.service:
         name: sshd
         state: restarted
 
     - name: restart fail2ban
-      service:
+      ansible.builtin.service:
         name: fail2ban
         state: restarted
