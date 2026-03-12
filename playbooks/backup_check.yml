@@ -1,65 +1,54 @@
-# backup_check.yml
 ---
-- name: Homelab Backup en Gezondheidscheck
-  hosts: all
+- name: "Homelab Full Backup Suite"
+  hosts: server
   become: yes
-  vars:
-    # Paden gebaseerd op je homelab structuur
-    source_dir: "/opt/homelab"
-    backup_dest: "/mnt/backup_schijf/homelab_backup"
-    rclone_config_name: "myremote"
-    max_disk_percent: 85
-    rclone_log: "/var/log/rclone.log"
+  
+  # DIT IS DE FIX: Expliciet de geheimen inladen
+  vars_files:
+    - "../group_vars/all/secret.yml"
 
   tasks:
-    # --- DEEL 1: DE BACKUP ---
-    - name: "Backup: Rsync naar lokale backup schijf"
-      ansible.posix.synchronize:
-        src: "{{ source_dir }}"
-        dest: "{{ backup_dest }}"
-        delete: yes
-        recursive: yes
+    # STAP 1: Fysieke check
+    - name: "Check: Is de USB schijf fysiek aanwezig?"
+      ansible.builtin.stat:
+        path: "{{ usb_device }}"
+      register: disk_present
+
+    - name: "Fail: Stop als schijf niet is aangesloten"
+      ansible.builtin.fail:
+        msg: "De USB schijf op {{ usb_device }} is niet gevonden!"
+      when: not disk_present.stat.exists
+
+    # STAP 2: Mount check & herstel
+    - name: "Check: Is de schijf gemount op {{ usb_mount_path }}?"
+      ansible.builtin.command: mountpoint -q {{ usb_mount_path }}
+      register: is_mounted
+      failed_when: false
+      changed_when: false
+
+    - name: "Mount: Koppel de schijf als dat nog niet zo is"
+      ansible.builtin.mount:
+        path: "{{ usb_mount_path }}"
+        src: "{{ usb_device }}"
+        fstype: ext4  # Pas aan naar 'ntfs' of 'vfat' indien nodig
+        state: mounted
+      when: is_mounted.rc != 0
+
+    # STAP 3: De Backup (Lokaal via Rsync)
+    - name: "Backup: Synchroniseer Home Assistant data"
+      ansible.builtin.shell:
+        cmd: "rsync -av --delete {{ backup_source_dir }}/ {{ usb_mount_path }}/homelab_backup/"
       register: rsync_result
 
-    - name: "Backup: Rclone naar de Cloud (optioneel)"
-      shell: "rclone sync {{ backup_dest }} {{ rclone_config_name }}:backup --log-file={{ rclone_log }}"
-      register: rclone_result
+    # STAP 4: Notificatie naar jouw Gotify
+    - name: "Notify: Stuur status naar Gotify"
+      ansible.builtin.uri:
+        url: "{{ vault_gotify_url }}/message?token={{ vault_gotify_token }}"
+        method: POST
+        body_format: json
+        body:
+          title: "💾 Backup Rapport Haarlem"
+          message: "Succesvolle backup van {{ backup_source_dir }} naar USB ({{ usb_device }}). Status: {{ rsync_result.rc }}"
+          priority: 5
+      when: rsync_result.rc == 0
       ignore_errors: yes
-
-    # --- DEEL 2: DE CONTROLES ---
-    - name: Systeem metrics ophalen
-      shell: |
-        load=$(cat /proc/loadavg | awk '{print $1}')
-        ram=$(free | awk '/Mem:/ {printf "%d", $3/$2 * 100}')
-        disk=$(df / --output=pcent | tail -1 | tr -dc '0-9')
-        echo "$load $ram $disk"
-      register: sys_perf
-      changed_when: false
-
-    - name: Check of alle containers draaien
-      shell: "docker ps -a --filter 'status=exited' --format '{ { .Names } }'"
-      register: failed_containers
-      changed_when: false
-
-    - name: Scan Rclone log op fouten
-      shell: "grep -Ei 'error|failed|fatal' {{ rclone_log }} | tail -n 1"
-      register: sync_errors
-      ignore_errors: yes
-      changed_when: false
-
-    # --- DEEL 3: HET EINDRAPPORT ---
-    - name: "RESULTAAT"
-      debug:
-        msg: >
-          {% set alerts = [] %}
-          {% if rsync_result.failed %}{% set _ = alerts.append('Rsync Backup mislukt') %}{% endif %}
-          {% if rclone_result.rc != 0 %}{% set _ = alerts.append('Rclone Sync mislukt') %}{% endif %}
-          {% if sys_perf.stdout.split()[2] | int > max_disk_percent %}{% set _ = alerts.append('Disk bijna vol') %}{% endif %}
-          {% if failed_containers.stdout != '' %}{% set _ = alerts.append('Containers gestopt: ' ~ failed_containers.stdout) %}{% endif %}
-          {% if sync_errors.stdout != '' %}{% set _ = alerts.append('Log errors in sync gevonden') %}{% endif %}
-          
-          {% if alerts | length > 0 %}
-          ER IS IETS MIS: {{ alerts | join(', ') }}
-          {% else %}
-          Alles Goed ! (Backup voltooid & Systeem gezond)
-          {% endif %}
