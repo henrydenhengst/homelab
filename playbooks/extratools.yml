@@ -1,5 +1,5 @@
 ---
-- name: De Ultieme Homelab & Docker Toolbox (35 Tools)
+- name: De Ultieme Homelab & Docker Toolbox (34 Tools)
   hosts: all
   become: yes
   vars:
@@ -46,15 +46,14 @@
         curl -L "https://github.com/bootandy/dust/releases/download/v1.1.1/dust-v1.1.1-x86_64-unknown-linux-musl.tar.gz" | tar -xz -C /usr/local/bin --strip-components=1
         curl -L "https://github.com/FiloSottile/age/releases/download/v1.1.1/age-v1.1.1-linux-amd64.tar.gz" | tar -xz -C /usr/local/bin --strip-components=1
 
-    - name: 7. Installeer Single Binaries (Dry, Hey, Ctop, Gping, Tealdeer, Micro)
+    - name: 7. Installeer Single Binaries (Dry, Hey, Ctop, Gping, Micro)
       shell: |
         curl -L -o /usr/local/bin/dry https://github.com/moncho/dry/releases/download/v0.11.1/dry-linux-amd64
         curl -L -o /usr/local/bin/hey https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64
         curl -L -o /usr/local/bin/ctop https://github.com/bcicen/ctop/releases/download/v0.7.7/ctop-0.7.7-linux-amd64
         curl -L -o /usr/local/bin/gping https://github.com/orf/gping/releases/download/gping-v1.16.1/gping-nix-x86_64
-        curl -L -o /usr/local/bin/tldr https://github.com/dbrgn/tealdeer/releases/download/v1.7.1/tealdeer-linux-x86_64-musl
         cd /usr/local/bin && curl -L https://getmic.ro | bash
-        chmod +x /usr/local/bin/dry /usr/local/bin/hey /usr/local/bin/ctop /usr/local/bin/gping /usr/local/bin/tldr /usr/local/bin/micro
+        chmod +x /usr/local/bin/dry /usr/local/bin/hey /usr/local/bin/ctop /usr/local/bin/gping /usr/local/bin/micro
 
     - name: 8. Installeer Extra's (GH, Procs, Dog, Fastfetch, Broot)
       shell: |
