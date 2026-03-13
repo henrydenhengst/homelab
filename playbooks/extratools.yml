@@ -1,0 +1,87 @@
+---
+- name: De Ultieme Homelab & Docker Toolbox (35 Tools)
+  hosts: all
+  become: yes
+  vars:
+    # 16 tools via standaard APT (Yamllint & lsb-release toegevoegd)
+    apt_tools: [bat, fzf, jq, zoxide, ripgrep, fd-find, htop, curl, git, unzip, ncdu, duf, jdupes, lsb-release, gpg, yamllint]
+
+  tasks:
+    - name: 1. Opschonen en APT Locks vrijgeven
+      shell: |
+        rm -f /etc/apt/sources.list.d/eza.list /etc/apt/sources.list.d/trivy.list
+        rm -f /var/lib/dpkg/lock* /var/lib/apt/lists/lock
+        apt-get autoremove -y
+      ignore_errors: yes
+
+    - name: 2. Voeg Trivy Repository toe
+      shell: |
+        curl -fsSL https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor -o /usr/share/keyrings/trivy.gpg --yes
+        echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" > /etc/apt/sources.list.d/trivy.list
+
+    - name: 3. Installatie APT pakketten (incl. Trivy)
+      apt:
+        name: "{{ apt_tools + ['trivy'] }}"
+        state: present
+        update_cache: yes
+
+    - name: 4. Installeer Eza & Dasel (Directe Binaries)
+      shell: |
+        # Eza
+        curl -L https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz | tar -xz -C /usr/local/bin
+        # Dasel
+        curl -L https://github.com/TomWright/dasel/releases/latest/download/dasel_linux_amd64 -o /usr/local/bin/dasel
+        chmod +x /usr/local/bin/eza /usr/local/bin/dasel
+
+    - name: 5. Installeer Dive via DEB
+      apt:
+        deb: https://github.com/wagoodman/dive/releases/download/v0.12.0/dive_0.12.0_linux_amd64.deb
+        state: present
+
+    - name: 6. Installeer Tarball Binaries (Lazy tools, Bottom, Dust, Age)
+      shell: |
+        curl -L "https://github.com/jesseduffield/lazydocker/releases/download/v0.23.1/lazydocker_0.23.1_Linux_x86_64.tar.gz" | tar -xz -C /usr/local/bin lazydocker
+        curl -L "https://github.com/jesseduffield/lazygit/releases/download/v0.40.2/lazygit_0.40.2_Linux_x86_64.tar.gz" | tar -xz -C /usr/local/bin lazygit
+        curl -L "https://github.com/ClementTsang/bottom/releases/download/0.9.6/bottom_x86_64-unknown-linux-musl.tar.gz" | tar -xz -C /usr/local/bin btm
+        curl -L "https://github.com/bootandy/dust/releases/download/v1.1.1/dust-v1.1.1-x86_64-unknown-linux-musl.tar.gz" | tar -xz -C /usr/local/bin --strip-components=1
+        curl -L "https://github.com/FiloSottile/age/releases/download/v1.1.1/age-v1.1.1-linux-amd64.tar.gz" | tar -xz -C /usr/local/bin --strip-components=1
+
+    - name: 7. Installeer Single Binaries (Dry, Hey, Ctop, Gping, Tealdeer, Micro)
+      shell: |
+        curl -L -o /usr/local/bin/dry https://github.com/moncho/dry/releases/download/v0.11.1/dry-linux-amd64
+        curl -L -o /usr/local/bin/hey https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64
+        curl -L -o /usr/local/bin/ctop https://github.com/bcicen/ctop/releases/download/v0.7.7/ctop-0.7.7-linux-amd64
+        curl -L -o /usr/local/bin/gping https://github.com/orf/gping/releases/download/gping-v1.16.1/gping-nix-x86_64
+        curl -L -o /usr/local/bin/tldr https://github.com/dbrgn/tealdeer/releases/download/v1.7.1/tealdeer-linux-x86_64-musl
+        cd /usr/local/bin && curl -L https://getmic.ro | bash
+        chmod +x /usr/local/bin/dry /usr/local/bin/hey /usr/local/bin/ctop /usr/local/bin/gping /usr/local/bin/tldr /usr/local/bin/micro
+
+    - name: 8. Installeer Extra's (GH, Procs, Dog, Fastfetch, Broot)
+      shell: |
+        curl -L "https://github.com/cli/cli/releases/download/v2.45.0/gh_2.45.0_linux_amd64.tar.gz" | tar -xz -C /usr/local/bin --strip-components=2 gh_2.45.0_linux_amd64/bin/gh
+        curl -L -o /tmp/procs.zip "https://github.com/dalance/procs/releases/download/v0.14.9/procs-v0.14.9-x86_64-linux.zip" && unzip -o /tmp/procs.zip -d /usr/local/bin/
+        curl -L -o /tmp/dog.zip "https://github.com/ogham/dog/releases/download/v0.1.0/dog-v0.1.0-x86_64-unknown-linux-gnu.zip" && unzip -o /tmp/dog.zip -d /usr/local/bin/ bin/dog && mv /usr/local/bin/bin/dog /usr/local/bin/dog && rm -rf /usr/local/bin/bin
+        curl -L -o /tmp/fastfetch.deb https://github.com/fastfetch-cli/fastfetch/releases/download/2.34.1/fastfetch-linux-amd64.deb && apt install /tmp/fastfetch.deb -y
+        curl -L -o /usr/local/bin/broot https://dystroy.org/broot/download/x86_64-linux/broot && chmod +x /usr/local/bin/broot
+
+    - name: 9. Bash Configuratie & Aliassen
+      blockinfile:
+        path: "~/.bashrc"
+        marker: "# {mark} ANSIBLE MASTER TOOLS"
+        block: |
+          alias cat='batcat'
+          alias ping='gping'
+          alias du='dust'
+          alias lzd='lazydocker'
+          alias lzg='lazygit'
+          alias top='btm'
+          alias fd='fdfind'
+          alias edit='micro'
+          alias inspect='dive'
+          alias scan='trivy image'
+          alias convert='dasel'
+          alias yamlcheck='yamllint'
+          alias ls='eza --icons'
+          alias ll='eza -lh --icons --git'
+          alias tree='eza --tree --icons'
+          [ -x /usr/bin/zoxide ] && eval "$(zoxide init bash)"

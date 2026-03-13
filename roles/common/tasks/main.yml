@@ -47,7 +47,7 @@
 # 6️⃣ Essentiële tools inclusief Lynis (Universeel)
 - name: "Zorg dat minimale beheer-tools aanwezig zijn"
   package:
-    name: [curl, git, htop, ncdu, ufw, fail2ban, lynis]
+    name: [curl, git, htop, ncdu, ufw, fail2ban, lynis, btop, iftop, gdu, ripgrep, fzf, bat, jq, yq, httpie, ranger, nnn, hyperfine, entr]
     state: present
 
 # 7️⃣ Controleer of het Lynis rapport bestaat
