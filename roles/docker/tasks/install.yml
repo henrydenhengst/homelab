@@ -1,4 +1,13 @@
 ---
+# 1. Ruim de oude conflicterende bestanden op die de error veroorzaken
+- name: "🧹 Verwijder conflicterende Docker repository bestanden"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/download_docker_com_linux_debian.list
+    - /etc/apt/sources.list.d/docker.list
+
 - name: "📦 Installeer systeem-afhankelijkheden"
   ansible.builtin.apt:
     name:
@@ -11,24 +20,37 @@
     state: present
     update_cache: yes
 
-- name: "🔑 Voeg Docker GPG-sleutel toe"
-  ansible.builtin.apt_key:
-    url: https://download.docker.com/linux/debian/gpg
-    state: present
+# 2. Moderne methode: Sleutel in de 'keyrings' map (vervangt apt_key)
+- name: "📁 Zorg dat de keyrings map bestaat"
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
 
+- name: "🔑 Download de officiële Docker GPG sleutel"
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/debian/gpg
+    dest: /etc/apt/keyrings/docker.gpg
+    mode: '0644'
+
+# 3. De Repository koppelen aan de specifieke sleutel (Signed-By)
 - name: "📂 Voeg officiële Docker Repository toe"
   ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
     state: present
+    filename: docker
+    update_cache: yes
 
-- name: "🐳 Installeer Docker Engine (Nieuwste Versie)"
+# 4. Installatie en Service
+- name: "🐳 Installeer Docker Engine"
   ansible.builtin.apt:
     name:
       - docker-ce
       - docker-ce-cli
       - containerd.io
-    state: latest
-    update_cache: yes
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
 
 - name: "🔄 Zorg dat Docker service draait en start bij boot"
   ansible.builtin.systemd:

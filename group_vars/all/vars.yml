@@ -60,7 +60,7 @@ name_gotify: "gotify"
 name_mosquitto: "mosquitto"
 
 # --- Subdomeinen (Caddy Routeering) ---
-ha_subdomain: "ha"
+ha_subdomain: "homeassistant"
 zigbee_subdomain: "zigbee"
 esphome_subdomain: "esphome"
 mqtt_subdomain: "mqtt"
