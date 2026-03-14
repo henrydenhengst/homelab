@@ -1,0 +1,18 @@
+---
+# Paden en Images
+docker_base_path: "/home/henry/homelab"
+image_zigbee2mqtt: "koenkk/zigbee2mqtt:latest"
+zigbee_device: "/dev/ttyUSB0"
+timezone: "Europe/Amsterdam"
+
+# Netwerk
+docker_network_name: "t2_network"
+
+# Eenmalig op true zetten om handmatige containers te overschrijven, 
+# daarna kun je dit op false zetten voor snelheid.
+z2m_recreate: false
+
+# Netwerk Keys (deze moeten overeenkomen met je apparaten)
+z2m_network_key: [0x01, 0x03, 0x05, 0x07, 0x09, 0x0b, 0x0d, 0x0f, 0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0d]
+z2m_pan_id: 6754
+z2m_ext_pan_id: [0xDD, 0x33, 0xFE, 0xCA, 0xBA, 0xBE, 0xEF, 0x01]

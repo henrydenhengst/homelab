@@ -1,0 +1,19 @@
+---
+# roles/zigbee2mqtt/handlers/main.yml
+
+- name: restart zigbee2mqtt
+  community.docker.docker_container:
+    name: zigbee2mqtt
+    image: "{{ image_zigbee2mqtt }}"
+    state: started
+    restart: yes
+    # Zorg dat alle instellingen hier exact gelijk zijn aan je task
+    # zodat de container met de juiste parameters herstart.
+    privileged: true
+    networks:
+      - name: "t2_network"
+    volumes:
+      - "{{ docker_base_path }}/zigbee2mqtt/data:/app/data"
+      - /run/udev:/run/udev:ro
+    devices:
+      - "{{ zigbee_device }}:/dev/ttyUSB0"

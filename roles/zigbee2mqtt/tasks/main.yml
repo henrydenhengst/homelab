@@ -1,35 +1,45 @@
 ---
-- name: Maak Zigbee2MQTT directory
-  file:
+- name: 1. Maak Zigbee2MQTT directory
+  ansible.builtin.file:
     path: "{{ docker_base_path }}/zigbee2mqtt/data"
     state: directory
     owner: "1000"
     group: "1000"
     mode: '0755'
 
-- name: Plaats Zigbee2MQTT configuratie
-  template:
+- name: 2. Fix USB stick rechten op host niveau
+  # Voorkomt 'Permission Denied' op de /dev/ttyUSB0 poort
+  ansible.builtin.file:
+    path: "{{ zigbee_device }}"
+    mode: '0666'
+
+- name: 3. Plaats Zigbee2MQTT configuratie
+  # Inclusief de fix voor 'homeassistant: enabled: true' en 'onboarding: false'
+  ansible.builtin.template:
     src: configuration.yaml.j2
     dest: "{{ docker_base_path }}/zigbee2mqtt/data/configuration.yaml"
+    owner: "1000"
+    group: "1000"
     mode: '0644'
+  register: z2m_config
+  notify: restart zigbee2mqtt
 
-- name: VERWIJDER OUDE ZIGBEE (Forceer schone lei)
-  docker_container:
-    name: zigbee2mqtt
-    state: absent
-
-- name: START ZIGBEE2MQTT
-  docker_container:
+- name: 4. START ZIGBEE2MQTT (Gekoppeld aan Mosquitto)
+  community.docker.docker_container:
     name: zigbee2mqtt
     image: "{{ image_zigbee2mqtt }}"
     state: started
     restart_policy: always
     privileged: true
-    # De poort-mapping die de 502 en de timeout heeft opgelost:
+    # Gebruikt de variabele uit defaults of forceert bij config wijziging
+    recreate: "{{ z2m_recreate | default(false) or z2m_config.changed }}"
+    networks:
+      - name: "{{ docker_network_name }}"
+    # De link lost de 'ENOTFOUND mosquitto' fout op
+    links:
+      - "mosquitto:mosquitto"
     ports:
       - "8080:8080"
-    networks:
-      - name: "t2_network"
     volumes:
       - "{{ docker_base_path }}/zigbee2mqtt/data:/app/data"
       - /run/udev:/run/udev:ro
@@ -37,12 +47,12 @@
       - "{{ zigbee_device }}:/dev/ttyUSB0"
     env:
       TZ: "{{ timezone }}"
-    recreate: yes
 
-- name: Wacht tot de Zigbee2MQTT Frontend bereikbaar is (Poort 8080)
-  wait_for:
-    host: "{{ ansible_host }}"
+- name: 5. Wacht tot de Zigbee2MQTT Frontend bereikbaar is (Lokaal)
+  # We checken op 127.0.0.1 om firewall issues vanaf de laptop te omzeilen
+  ansible.builtin.wait_for:
     port: 8080
-    delay: 10      # Geef de container tijd om de USB-stick te initialiseren
-    timeout: 120   # Ruime marge voor database-migraties
-    msg: "⚠️ Zigbee2MQTT frontend start traag of niet. Check: docker logs zigbee2mqtt"
+    host: 127.0.0.1
+    delay: 10
+    timeout: 150
+    msg: "⚠️ Zigbee2MQTT gestart, maar poort 8080 reageert niet binnen 150s."
