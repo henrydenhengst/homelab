@@ -1,0 +1,21 @@
+- name: "Plaats Flame configuratiebestand"
+  ansible.builtin.template:
+    dest: "/home/{{ main_user }}/flame/data/apps.yml"
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
+    mode: '0644'
+  vars:
+    # We gebruiken de variabelen zodat je nooit meer handmatig URLs hoeft te typen
+    duck_url: "{{ duckdns_domain }}.duckdns.org"
+  content: |
+    - name: "Haarlem Suite"
+      items:
+        - name: "Home Assistant"
+          icon: "home-assistant"
+          url: "https://homeassistant.{{ duck_url }}"
+        - name: "Vaultwarden"
+          icon: "shield-key"
+          url: "https://vault.{{ duck_url }}"
+        - name: "Portainer"
+          icon: "docker"
+          url: "https://portainer.{{ duck_url }}"

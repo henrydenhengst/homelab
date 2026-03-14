@@ -1,13 +1,36 @@
-# Default configuration
-default_config:
+# Home Assistant Core Configuration
+homeassistant:
+  name: "{{ vault_homelab_name }}"
+  time_zone: "{{ timezone }}"
+  external_url: "https://{{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }}"
+  internal_url: "http://homeassistant:8123"
+  packages: !include_dir_named packages
+
+# Vervanger voor default_config om duplicaten te voorkomen
+config:
+frontend:
+history:
+image:
+logbook:
+map:
+mobile_app:
+my:
+person:
+scene:
+script:
+sun:
+system_health:
+tag:
+updater:
+zone:
 
 # HTTP & trusted proxies
 http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
-    - {{ docker_network_range }}  # Docker network range
-    - {{ local_network_range }} # Optioneel: je lokale netwerk
+    - {{ docker_network_range }}
+    - {{ local_network_range }}
 
 # Database
 recorder:
@@ -15,14 +38,9 @@ recorder:
   purge_keep_days: 30
   commit_interval: 30
 
-# Home Assistant core
-homeassistant:
-  name: "{{ vault_homelab_name }}"
-  time_zone: "{{ timezone }}"
-  external_url: "https://{{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }}"
-  internal_url: "http://homeassistant:8123"
-
-# MQTT - UITGE COMMENTAAR (via UI instellen)
-# mqtt:
-#   broker: mosquitto
-#   discovery: true
+# Omgevingssensoren
+sensor:
+  - platform: rest
+    name: "Luchtkwaliteit_Schalkwijk"
+    resource: "https://api.luchtmeetnet.nl/open_api/stations/NL01488/measurements?formula=PM25"
+    value_template: "{% raw %}{{ value_json.data[0].value }}{% endraw %}"

@@ -1,0 +1,14 @@
+- name: "Configureer Flame Settings"
+  ansible.builtin.template:
+    dest: "/home/{{ main_user }}/flame/data/settings.yml"
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
+    mode: '0644'
+    content: |
+      ---
+      unnamed_group_priority: 99
+      theme: "{{ flame_theme }}"
+      lat_long: "{{ flame_lat_long }}"
+      city: "{{ flame_city }}"
+      weather_interval: 5
+      datetime_format: "DD-MM-YYYY HH:mm:ss"

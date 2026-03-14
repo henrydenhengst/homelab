@@ -5,7 +5,7 @@
     state: present
 
 - name: Maak Vaultwarden data directory
-  file:
+  ansible.builtin.file:
     path: "/home/{{ main_user }}/vaultwarden"
     state: directory
     owner: "{{ main_user }}"
@@ -16,7 +16,9 @@
   community.docker.docker_container:
     name: vaultwarden
     image: "{{ image_vaultwarden }}"
+    state: started
     restart_policy: always
+    recreate: yes  # Forceert herstart met de nieuwe omgevingsvariabelen
     networks:
       - name: "{{ docker_network_name }}"
     volumes:
@@ -24,3 +26,5 @@
     env:
       ADMIN_TOKEN: "{{ vaultwarden_admin_token }}"
       DOMAIN: "https://vault.{{ duckdns_domain }}.{{ domain }}"
+      SIGNUPS_ALLOWED: "false"      # Blokkeert nieuwe registraties
+      INVITATIONS_ALLOWED: "false"  # Blokkeert uitnodigingen voor extra veiligheid

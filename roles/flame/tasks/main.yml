@@ -1,15 +1,24 @@
 ---
-- name: Maak Flame data mappen aan op de host
+- name: Zorg dat de data map schoon is
   file:
-    path: "{{ docker_base_path }}/flame/data"
+    path: "/opt/docker/flame/data"
     state: directory
     owner: "1000"
     group: "1000"
     mode: '0755'
 
-- name: Maak Flame apps configuratie (apps.yml)
+- name: Verwijder stoorzenders (oude db/config)
+  file:
+    path: "/opt/docker/flame/data/{{ item }}"
+    state: absent
+  loop:
+    - config.json
+    - db.sqlite
+  # Dit dwingt Flame om de apps.yml opnieuw in te lezen
+
+- name: Maak de definitieve apps.yml
   copy:
-    dest: "{{ docker_base_path }}/flame/data/apps.yml"
+    dest: "/opt/docker/flame/data/apps.yml"
     owner: "1000"
     group: "1000"
     mode: '0644'
@@ -38,43 +47,43 @@
 
       - name: "Systeem Status"
         items:
-          - name: "Fail2Ban"
-            icon: "shield-check"
-            url: "#"
-            subtitle: "Vesting Beveiliging: Actief"
+          - name: "Vaultwarden"
+            icon: "lock"
+            url: "https://vault.{{ duckdns_domain }}.duckdns.org"
+            subtitle: "Wachtwoord Kluis"
   notify: Restart Flame
 
-- name: Maak Flame algemene instellingen (settings.yml)
+- name: Maak de settings.yml
   copy:
-    dest: "{{ docker_base_path }}/flame/data/settings.yml"
+    dest: "/opt/docker/flame/data/settings.yml"
     owner: "1000"
     group: "1000"
     mode: '0644'
     content: |
       app:
-        name: "{{ flame_dashboard_name | default(vault_homelab_name) }}"
+        name: "Den Hengst Homelab"
         theme: "dark"
       search:
         enabled: true
         engine: "google"
       weather:
         enabled: true
-        city: "{{ flame_city | default('Haarlem') }}"
-        location: "{{ flame_lat_long | default('52.3874,4.6462') }}"
+        city: "Haarlem"
+        location: "52.3874,4.6462"
         units: metric
   notify: Restart Flame
 
 - name: Start Flame Dashboard container
   docker_container:
     name: flame
-    image: "{{ image_flame }}"
+    image: "pawelmalak/flame:latest"
     state: started
+    recreate: yes
     restart_policy: unless-stopped
-    # HIER GEBEURT DE MAGIE:
     networks:
       - name: "t2_network"
     volumes:
-      - "{{ docker_base_path }}/flame/data:/app/data"
+      - "/opt/docker/flame/data:/app/data"
     published_ports:
       - "5005:5005"
     env:
