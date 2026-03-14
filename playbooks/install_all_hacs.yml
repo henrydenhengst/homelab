@@ -1,49 +1,32 @@
-# install_all_hacs.yml
+# syntax: ansible-playbook -i inventory/hosts playbooks/install_all_hacs.yml --ask-vault-pass
 ---
 - name: Installeer volledige lijst HACS Componenten
   hosts: all
   become: yes
+  
   vars_files:
-    - secret.yml
+    - "../group_vars/all/secret.yml"
+
   vars:
     ha_config_dir: "/home/{{ ansible_user }}/homelab/homeassistant"
 
-    # Alle Integraties (custom_components)
     hacs_integrations:
       - { name: "adaptive_lighting", repo: "basnijholt/adaptive-lighting" }
-      - { name: "waste_collection_schedule", repo: "mampyllion/waste_collection_schedule" }
       - { name: "alarmo", repo: "nielsfaber/alarmo" }
-      - { name: "automation_suggestions", repo: "aneisch/homeassistant-automation-suggestions" }
       - { name: "battery_notes", repo: "andrew-codechimp/HA-Battery-Notes" }
-      - { name: "blitzortung", repo: "mr-vinn/home-assistant-blitzortung" }
-      - { name: "buienradar", repo: "m_reuter/buienradar" }
-      - { name: "dsmr_reader", repo: "custom-components/dsmr_reader" }
       - { name: "energieprijzen", repo: "custom-components/nordpool" }
-      - { name: "gotify", repo: "ctiszen/hacs-gotify" }
-      - { name: "knmi", repo: "wouterdevelder/knmi-home-assistant" }
       - { name: "local_tuya", repo: "rospogrigio/localtuya" }
-      - { name: "pirate_weather", repo: "PirateWeather/pirateweather" }
       - { name: "powercalc", repo: "bramstroker/homeassistant-powercalc" }
-      - { name: "rws_verkeer", repo: "pbrandao/hass_rws_verkeer" }
       - { name: "smartir", repo: "smartHomeHub/SmartIR" }
       - { name: "sonoff", repo: "AlexxIT/SonoffLAN" }
       - { name: "spook", repo: "frenck/spook" }
-      - { name: "switch_manager", repo: "Sian-92/switch-manager" }
-      - { name: "watchman", repo: "dext0rb/ha-watchman" }
 
-    # Alle Frontend (www)
     hacs_frontend:
       - { name: "apexcharts-card", repo: "RomRider/apexcharts-card" }
-      - { name: "atomic-calendar-revive", repo: "totaland/atomic-calendar-revive" }
       - { name: "auto-entities", repo: "thomasloven/lovelace-auto-entities" }
-      - { name: "big-number-card", repo: "custom-cards/big-number-card" }
-      - { name: "bubble-card", repo: "C_soft/bubble-card" }
       - { name: "button-card", repo: "custom-cards/button-card" }
       - { name: "card-mod", repo: "thomasloven/lovelace-card-mod" }
       - { name: "clock-weather-card", repo: "pkissling/clock-weather-card" }
-      - { name: "decluttering-card", repo: "romrider/decluttering-card" }
-      - { name: "google-home-theme", repo: "Lestat91/google-home-theme" }
-      - { name: "swipe-navigation", repo: "maykar/hass-swipe-navigation" }
       - { name: "kiosk-mode", repo: "maykar/kiosk-mode" }
       - { name: "layout-card", repo: "thomasloven/lovelace-layout-card" }
       - { name: "mini-graph-card", repo: "kalkih/mini-graph-card" }
@@ -55,7 +38,6 @@
       - { name: "slider-entity-row", repo: "thomasloven/lovelace-slider-entity-row" }
       - { name: "state-switch", repo: "thomasloven/lovelace-state-switch" }
       - { name: "vertical-stack-in-card", repo: "ofekashery/vertical-stack-in-card" }
-      - { name: "weather-card-chart", repo: "Yevgenium/weather-card-chart" }
 
   tasks:
     - name: Directories aanmaken
@@ -75,6 +57,7 @@
         dest: "{{ ha_config_dir }}/custom_components/{{ item.name }}"
         depth: 1
         force: yes
+        version: HEAD
       loop: "{{ hacs_integrations }}"
       register: git_integrations
 
@@ -84,10 +67,13 @@
         dest: "{{ ha_config_dir }}/www/{{ item.name }}"
         depth: 1
         force: yes
+        version: HEAD
       loop: "{{ hacs_frontend }}"
+      register: git_frontend
 
-    - name: Herstart HA
+    - name: Herstart Home Assistant container
       community.docker.docker_container:
         name: homeassistant
-        state: restarted
-      when: git_integrations.changed
+        state: started
+        restart: yes
+      when: git_integrations.changed or git_frontend.changed
