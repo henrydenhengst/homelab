@@ -20,6 +20,13 @@
     name: rsync
     state: present
 
+- name: Maak de backup-map voor Postgres aan op de host
+  file:
+    path: /opt/backups/postgres
+    state: directory
+    mode: '0755'
+    owner: "{{ main_user }}"
+
 - name: Maak het USB backup script aan
   template:
     src: usb_backup.sh.j2
@@ -32,4 +39,4 @@
     name: "Dagelijkse USB backup naar {{ usb_mount_path }}"
     hour: "03"
     minute: "00"
-    job: "/usr/local/bin/usb_backup.sh > /dev/null 2>&1"
+    job: "/usr/local/bin/usb_backup.sh > /var/log/usb_backup.log 2>&1"

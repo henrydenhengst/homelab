@@ -1,18 +1,42 @@
 #!/bin/bash
+
 # Check of de schijf echt aanwezig is voor we gaan schrijven
 if mountpoint -q {{ usb_mount_path }}; then
-    echo "USB schijf gevonden. Start synchronisatie..."
+    echo "$(date): USB schijf gevonden. Start voorbereiding..."
     
-    # Backup van je containers en data
+    # 1. PostgreSQL Dump (indien de container draait)
+    # We dumpen de data naar /opt/backups zodat rsync het dadelijk meepakt
+    if [ "$(docker ps -q -f name=postgres)" ]; then
+        echo "PostgreSQL container gevonden. Dump maken..."
+        docker exec postgres pg_dumpall -U {{ postgres_user | default('postgres') }} > /opt/backups/postgres/full_backup.sql
+    fi
+
+    # 2. Containers stoppen voor database integriteit (SQLite)
+    echo "Containers tijdelijk stoppen..."
+    # We slaan de namen op om dadelijk exact dezelfde containers weer te starten
+    RUNNING_CONTAINERS=$(docker ps -q)
+    if [ ! -z "$RUNNING_CONTAINERS" ]; then
+        docker stop $RUNNING_CONTAINERS
+    fi
+
+    # 3. Synchronisatie naar USB
+    echo "Start rsync naar USB..."
+    # Backup van je containers en data (inclusief de Postgres dump in /opt/backups)
     rsync -av --delete /opt/ {{ usb_mount_path }}/opt_backup/
     
     # Backup van je systeemconfiguratie
     rsync -av --delete /etc/ {{ usb_mount_path }}/etc_backup/
+
+    # 4. Containers weer aanzetten
+    if [ ! -z "$RUNNING_CONTAINERS" ]; then
+        echo "Containers herstarten..."
+        docker start $RUNNING_CONTAINERS
+    fi
     
     # Log de tijd van de laatste backup op de schijf zelf
     date > {{ usb_mount_path }}/last_backup.txt
-    echo "Backup succesvol afgerond."
+    echo "$(date): Backup succesvol afgerond."
 else
-    echo "FOUT: USB schijf niet gemount op {{ usb_mount_path }}. Backup afgebroken."
+    echo "$(date): FOUT - USB schijf niet gemount op {{ usb_mount_path }}. Backup afgebroken."
     exit 1
 fi
