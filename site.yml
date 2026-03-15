@@ -4,6 +4,15 @@
   become: yes
   gather_facts: yes
 
+  # 🔍 We checken EERST of de Flame container bestaat vóórdat we rollen uitvoeren
+  pre_tasks:
+    - name: "Check of Flame container al bestaat"
+      # We zetten de format string tussen {% raw %} zodat Ansible er niet aan komt
+      ansible.builtin.command: docker ps -a --format '{% raw %}{{.Names}}{% endraw %}'
+      register: running_containers
+      changed_when: false
+      failed_when: false
+
   roles:
     # 1. 🏗️ De Fundering
     - role: common
@@ -29,7 +38,10 @@
     # 5. 🧠 Het Brein & Dashboards
     - role: homeassistant
     - role: esphome
-    - role: flame
+    
+    # 🔥 DE VEILIGHEIDSKLEP: Flame wordt ALLEEN uitgevoerd als de naam 'flame' 
+    # NIET voorkomt in de lijst van actieve/bestaande containers.
+    - { role: flame, when: "'flame' not in running_containers.stdout" }
 
     # 6. 📂 Backups
     - role: rsync

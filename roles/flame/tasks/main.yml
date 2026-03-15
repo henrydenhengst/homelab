@@ -1,5 +1,5 @@
 ---
-- name: Zorg dat de data map schoon is
+- name: Zorg dat de data map bestaat
   file:
     path: "/opt/docker/flame/data"
     state: directory
@@ -7,14 +7,15 @@
     group: "1000"
     mode: '0755'
 
-- name: Verwijder stoorzenders (oude db/config)
+- name: Forceer Ansible-configuratie (verwijder lokale database)
   file:
     path: "/opt/docker/flame/data/{{ item }}"
     state: absent
   loop:
     - config.json
     - db.sqlite
-  # Dit dwingt Flame om de apps.yml opnieuw in te lezen
+  # Dit is de 'verdedigingslinie': we ruimen de database op zodat Flame 
+  # verplicht wordt de onderstaande YAML-bestanden in te laden.
 
 - name: Maak de definitieve apps.yml
   copy:
@@ -51,7 +52,7 @@
             icon: "lock"
             url: "https://vault.{{ duckdns_domain }}.duckdns.org"
             subtitle: "Wachtwoord Kluis"
-  notify: Restart Flame
+  register: apps_config
 
 - name: Maak de settings.yml
   copy:
@@ -71,14 +72,15 @@
         city: "Haarlem"
         location: "52.3874,4.6462"
         units: metric
-  notify: Restart Flame
+  register: settings_config
 
 - name: Start Flame Dashboard container
   docker_container:
     name: flame
     image: "pawelmalak/flame:latest"
     state: started
-    recreate: yes
+    # Recreate zorgt ervoor dat de container de nieuwe bestanden direct oppakt
+    recreate: "{{ apps_config.changed or settings_config.changed }}"
     restart_policy: unless-stopped
     networks:
       - name: "t2_network"
