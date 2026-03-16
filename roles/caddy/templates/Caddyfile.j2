@@ -73,6 +73,9 @@
 }
 
 # 9. Uptime Kuma monitoring
-{{ uptime_kuma_subdomain }}.{{ flame_subdomain }}.{{ domain }} {
+{{ uptime_kuma_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
     reverse_proxy {{ uptime_kuma_container_name }}:{{ uptime_kuma_port }}
 }
+
+
