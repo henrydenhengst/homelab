@@ -1,0 +1,5 @@
+---
+image_uptime_kuma: "louislam/uptime-kuma:latest"
+uptime_kuma_container_name: "uptime-kuma"
+uptime_kuma_subdomain: "kuma"
+uptime_kuma_port: 3001

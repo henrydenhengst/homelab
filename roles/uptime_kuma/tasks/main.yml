@@ -1,0 +1,38 @@
+---
+- name: Maak Uptime Kuma data directory
+  ansible.builtin.file:
+    path: "{{ docker_base_path }}/uptime-kuma/data"
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: '0755'
+
+- name: START UPTIME KUMA
+  community.docker.docker_container:
+    name: "{{ uptime_kuma_container_name }}"
+    image: "{{ image_uptime_kuma }}"
+    state: started
+    restart_policy: always
+    pull: yes
+    recreate: yes
+    container_default_behavior: no_defaults
+    networks:
+      - name: "{{ docker_network_name }}"
+    volumes:
+      - "{{ docker_base_path }}/uptime-kuma/data:/app/data"
+    env:
+      TZ: "{{ timezone }}"
+    labels:
+      com.docker.compose.service: "uptime-kuma"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:{{ uptime_kuma_port }}/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+- name: Bevestig dat Uptime Kuma container draait
+  community.docker.docker_container_info:
+    name: "{{ uptime_kuma_container_name }}"
+  register: uptime_kuma_info
+  failed_when: not uptime_kuma_info.exists or not uptime_kuma_info.container.State.Running

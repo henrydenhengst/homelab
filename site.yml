@@ -19,6 +19,7 @@
     - role: security
     - role: fail2ban
     - role: docker
+    - role: uptime_kuma
 
     # 2. 🛡️ De Poortwachter
     - role: duckdns
@@ -30,6 +31,7 @@
     - role: postgres
     - role: mosquitto
     - role: gotify
+    - role: loggifly
 
     # 4. 🔍 Hardware & Bridges
     - { role: zigbee2mqtt, when: "zigbee_device is defined" }

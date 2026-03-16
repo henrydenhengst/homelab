@@ -1,0 +1,39 @@
+---
+- name: Maak LoggiFly config directory
+  ansible.builtin.file:
+    path: "{{ docker_base_path }}/loggifly/config"
+    state: directory
+    mode: '0755'
+
+- name: Deploy LoggiFly configuratie
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ docker_base_path }}/loggifly/config/config.yaml"
+    mode: '0644'
+  notify: restart loggifly
+
+- name: START LOGGIFLY
+  community.docker.docker_container:
+    name: "{{ loggifly_container_name }}"
+    image: "{{ image_loggifly }}"
+    state: started
+    restart_policy: always
+    pull: yes
+    recreate: yes
+    container_default_behavior: no_defaults
+    networks:
+      - name: "{{ docker_network_name }}"
+      - name: "db_internal"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ docker_base_path }}/loggifly/config:/config:ro"
+    env:
+      TZ: "{{ timezone }}"
+    labels:
+      com.docker.compose.service: "loggifly"
+
+- name: Bevestig dat LoggiFly container draait
+  community.docker.docker_container_info:
+    name: "{{ loggifly_container_name }}"
+  register: loggifly_info
+  failed_when: not loggifly_info.exists or not loggifly_info.container.State.Running

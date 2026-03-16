@@ -71,3 +71,8 @@
 
     reverse_proxy {{ name_mosquitto }}:{{ port_mqtt_web }}
 }
+
+# 9. Uptime Kuma monitoring
+{{ uptime_kuma_subdomain }}.{{ flame_subdomain }}.{{ domain }} {
+    reverse_proxy {{ uptime_kuma_container_name }}:{{ uptime_kuma_port }}
+}

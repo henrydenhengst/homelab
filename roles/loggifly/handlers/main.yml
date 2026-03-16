@@ -1,0 +1,6 @@
+---
+- name: restart loggifly
+  community.docker.docker_container:
+    name: "{{ loggifly_container_name }}"
+    state: started
+    restart: true

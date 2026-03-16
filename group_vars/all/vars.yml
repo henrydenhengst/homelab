@@ -68,3 +68,11 @@ vault_subdomain: "vault"
 portainer_subdomain: "portainer"
 gotify_subdomain: "gotify"
 flame_subdomain: "denhengst"
+
+# --- Uptime Kuma ---
+image_uptime_kuma: "louislam/uptime-kuma:latest"
+uptime_kuma_subdomain: "kuma"
+uptime_kuma_port: 3001
+
+# --- LoggiFly ---
+image_loggifly: "ghcr.io/clemcer/loggifly:v1"

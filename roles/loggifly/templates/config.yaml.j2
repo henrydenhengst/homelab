@@ -1,0 +1,68 @@
+# LoggiFly configuratie - gegenereerd door Ansible
+monitors:
+  # Caddy monitoring
+  - container_name: {{ name_caddy | default('caddy') }}
+    rules:
+      - pattern: "error|failed|panic|timeout|5[0-9][0-9]"
+        notify:
+          - apprise
+        cooldown: 300
+
+  # Fail2ban monitoring (als container)
+  - container_name: fail2ban
+    rules:
+      - pattern: "Ban|Unban|Found|sshd"
+        notify:
+          - apprise
+        cooldown: 60
+
+  # PostgreSQL monitoring (in db_internal netwerk)
+  - container_name: postgres
+    rules:
+      - pattern: "ERROR|FATAL|PANIC|could not connect"
+        notify:
+          - apprise
+        cooldown: 300
+
+  # Portainer monitoring
+  - container_name: {{ name_portainer }}
+    rules:
+      - pattern: "error|failed|panic"
+        notify:
+          - apprise
+        cooldown: 300
+
+  # Uptime Kuma zelf-monitoring
+  - container_name: uptime-kuma
+    rules:
+      - pattern: "error|failed|panic"
+        notify:
+          - apprise
+        cooldown: 300
+
+  # Home Assistant monitoring
+  - container_name: {{ name_ha }}
+    rules:
+      - pattern: "ERROR|FATAL|Panic|Disconnected"
+        notify:
+          - apprise
+        cooldown: 300
+
+  # Mosquitto monitoring
+  - container_name: {{ name_mosquitto }}
+    rules:
+      - pattern: "error|failed|panic|socket"
+        notify:
+          - apprise
+        cooldown: 300
+
+  # Zigbee2MQTT monitoring
+  - container_name: {{ name_zigbee2mqtt }}
+    rules:
+      - pattern: "error|failed|panic|disconnected"
+        notify:
+          - apprise
+        cooldown: 300
+
+apprise:
+  - url: "gotify://{{ name_gotify }}:{{ port_gotify }}/{{ vault_loggifly_gotify_token }}/?priority=8"
