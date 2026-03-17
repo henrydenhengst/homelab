@@ -25,6 +25,7 @@
     - role: duckdns
     - role: caddy
     - role: portainer
+    - role: dozzle
 
     # 3. 🔐 Applicaties & Data
     - role: vaultwarden

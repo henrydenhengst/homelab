@@ -78,4 +78,10 @@
     reverse_proxy {{ uptime_kuma_container_name }}:{{ uptime_kuma_port }}
 }
 
+# 10. Dozzle log viewer
+{{ dozzle_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
+    import basic_auth
+    reverse_proxy {{ dozzle_container_name }}:{{ dozzle_port }}
+}
 

@@ -81,3 +81,9 @@ uptime_kuma_retries: 2
 
 # --- LoggiFly ---
 image_loggifly: "ghcr.io/clemcer/loggifly:v1"
+
+# --- Dozzle log viewer ---
+image_dozzle: "amir20/dozzle:latest"
+dozzle_subdomain: "logs"
+dozzle_port: 8080
+

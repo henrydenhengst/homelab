@@ -1,0 +1,5 @@
+---
+image_dozzle: "amir20/dozzle:latest"
+dozzle_container_name: "dozzle"
+dozzle_port: 8080
+dozzle_subdomain: "logs"
