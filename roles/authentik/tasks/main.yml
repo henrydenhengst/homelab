@@ -1,0 +1,27 @@
+# --- DATABASE SETUP ---
+
+- name: Maak Authentik database aan
+  community.docker.docker_container_exec:
+    container: "postgres_db"
+    user: "{{ vault_postgres_user }}"
+    command: psql -d postgres -c "CREATE DATABASE authentik;"
+  register: db_result
+  failed_when: false
+  ignore_errors: yes
+
+- name: Maak Authentik database user aan
+  community.docker.docker_container_exec:
+    container: "postgres_db"
+    user: "{{ vault_postgres_user }}"
+    command: psql -d postgres -c "CREATE USER authentik WITH PASSWORD '{{ vault_authentik_database_password }}';"
+  register: user_result
+  failed_when: false
+  ignore_errors: yes
+
+- name: Geef Authentik user rechten op de database
+  ansible.builtin.shell: >
+    docker exec -u {{ vault_postgres_user }} postgres_db 
+    psql -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE authentik TO authentik;"
+  register: grant_result
+  failed_when: false
+  ignore_errors: yes

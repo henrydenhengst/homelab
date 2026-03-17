@@ -85,3 +85,9 @@
     reverse_proxy {{ dozzle_container_name }}:{{ dozzle_port }}
 }
 
+# 11. Authentik SSO
+{{ authentik_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
+    import duckdns_auth
+    reverse_proxy {{ authentik_container_name_server }}:{{ authentik_port_http }}
+}
+

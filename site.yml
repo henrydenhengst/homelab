@@ -4,10 +4,9 @@
   become: yes
   gather_facts: yes
 
-  # 🔍 We checken EERST of de Flame container bestaat vóórdat we rollen uitvoeren
+  # 🔍 Pre-check voor Flame (ongewijzigd)
   pre_tasks:
     - name: "Check of Flame container al bestaat"
-      # We zetten de format string tussen {% raw %} zodat Ansible er niet aan komt
       ansible.builtin.command: docker ps -a --format '{% raw %}{{.Names}}{% endraw %}'
       register: running_containers
       changed_when: false
@@ -21,32 +20,35 @@
     - role: docker
     - role: uptime_kuma
 
-    # 2. 🛡️ De Poortwachter
+    # 2. 📂 Data & Infrastructuur (Eerst de basis leggen)
     - role: duckdns
-    - role: caddy
     - role: portainer
     - role: dozzle
+    - role: postgres    # Database MOET draaien voor de rest
 
-    # 3. 🔐 Applicaties & Data
+    # 3. 🔐 Applicaties & SSO
+    # We draaien Authentik direct na Postgres
+    - role: authentik
+
+    # 4. 🛡️ De Poortwachter (Nu pas Caddy, als alles erachter leeft)
+    - role: caddy
+
+    # 5. ⚡ Overige Services
     - role: vaultwarden
-    - role: postgres
     - role: mosquitto
     - role: gotify
     - role: loggifly
 
-    # 4. 🔍 Hardware & Bridges
+    # 6. 🔍 Hardware & Bridges
     - { role: zigbee2mqtt, when: "zigbee_device is defined" }
     - { role: zwavejsui,   when: "zwave_device is defined" }
 
-    # 5. 🧠 Het Brein & Dashboards
+    # 7. 🧠 Het Brein & Dashboards
     - role: homeassistant
     - role: esphome
-    
-    # 🔥 DE VEILIGHEIDSKLEP: Flame wordt ALLEEN uitgevoerd als de naam 'flame' 
-    # NIET voorkomt in de lijst van actieve/bestaande containers.
     - { role: flame, when: "'flame' not in running_containers.stdout" }
 
-    # 6. 📂 Backups
+    # 8. 📂 Backups
     - role: rsync
     - role: rclone
 

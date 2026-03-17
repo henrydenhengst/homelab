@@ -1,0 +1,21 @@
+---
+# Authentik configuratie
+image_authentik_server: "ghcr.io/goauthentik/server:latest"
+image_authentik_worker: "ghcr.io/goauthentik/server:latest"
+image_authentik_redis: "redis:alpine"
+
+authentik_container_name_server: "authentik-server"
+authentik_container_name_worker: "authentik-worker"
+authentik_container_name_redis: "authentik-redis"
+
+authentik_subdomain: "auth"
+authentik_port_http: 9000
+authentik_port_https: 9443
+
+# Geheimen (moeten in secret.yml!)
+authentik_secret_key: "{{ vault_authentik_secret_key }}"
+authentik_database_password: "{{ vault_authentik_database_password }}"
+authentik_redis_password: "{{ vault_authentik_redis_password }}"
+authentik_bootstrap_token: "{{ vault_authentik_bootstrap_token }}"
+authentik_bootstrap_email: "{{ vault_authentik_bootstrap_email }}"
+authentik_bootstrap_password: "{{ vault_authentik_bootstrap_password }}"

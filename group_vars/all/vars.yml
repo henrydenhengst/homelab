@@ -87,3 +87,11 @@ image_dozzle: "amir20/dozzle:latest"
 dozzle_subdomain: "logs"
 dozzle_port: 8080
 
+# --- Authentik SSO ---
+image_authentik_server: "ghcr.io/goauthentik/server:latest"
+image_authentik_worker: "ghcr.io/goauthentik/server:latest"
+image_authentik_redis: "redis:alpine"
+authentik_subdomain: "auth"
+authentik_port_http: 9000
+authentik_port_https: 9443
+

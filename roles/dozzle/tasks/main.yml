@@ -20,12 +20,8 @@
       DOZZLE_NO_ANALYTICS: "true"
     labels:
       com.docker.compose.service: "dozzle"
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:{{ dozzle_port }}"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+    # Healthcheck verwijderd omdat Dozzle geen wget/curl aan boord heeft.
+    # Dit haalt het rode uitroepteken in ctop weg.
 
 - name: Bevestig dat Dozzle container draait
   community.docker.docker_container_info:
