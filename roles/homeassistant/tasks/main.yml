@@ -1,4 +1,14 @@
 ---
+# ==============================================================================
+# BESTANDEN & DIRECTORIES
+# ==============================================================================
+
+- name: "Files: Maak config directory"
+  ansible.builtin.file:
+    path: "{{ ha_config_dir }}"
+    state: directory
+    mode: '0755'
+
 - name: "HACS: Installatie"
   ansible.builtin.shell:
     cmd: "wget -O - https://get.hacs.xyz | bash -"
@@ -12,6 +22,10 @@
   loop:
     - { name: 'p2000', repo: 'https://github.com/cyberjunky/home-assistant-p2000.git' }
 
+# ==============================================================================
+# CONFIGURATIE (TEMPLATES)
+# ==============================================================================
+
 - name: "Config: Hoofdconfiguratie via Template"
   ansible.builtin.template:
     src: configuration.yaml.j2
@@ -24,3 +38,25 @@
     src: automations.yaml.j2
     dest: "{{ ha_config_dir }}/automations.yaml"
   notify: "Restart Home Assistant"
+
+# ==============================================================================
+# DOCKER CONTAINER START
+# ==============================================================================
+
+- name: "START HOME ASSISTANT"
+  community.docker.docker_container:
+    name: "homeassistant"
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    state: started
+    restart_policy: always
+    privileged: yes
+    networks:
+      - name: "{{ docker_network_name }}"
+    volumes:
+      - "{{ ha_config_dir }}:/config"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/run/dbus:/run/dbus:ro"
+    devices:
+      - "{{ zigbee_device }}:{{ zigbee_device }}"
+    env:
+      TZ: "{{ timezone }}"

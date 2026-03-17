@@ -1,12 +1,12 @@
 # Home Assistant Core Configuration
 homeassistant:
-  name: "{{ vault_homelab_name }}"
+  name: "{{ vault_homelab_name | default('Haarlem Homelab') }}"
   time_zone: "{{ timezone }}"
   external_url: "https://{{ ha_subdomain }}.{{ duckdns_domain }}.{{ domain }}"
   internal_url: "http://homeassistant:8123"
   packages: !include_dir_named packages
 
-# Vervanger voor default_config om duplicaten te voorkomen
+# Basisfunctionaliteiten (Vervanging voor default_config om conflicten te vermijden)
 config:
 frontend:
 history:
@@ -24,23 +24,25 @@ tag:
 updater:
 zone:
 
-# HTTP & trusted proxies
+# HTTP & trusted proxies voor Caddy/Reverse Proxy
 http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
-    - {{ docker_network_range }}
-    - {{ local_network_range }}
+    - "{{ docker_network_range }}"
+    - "{{ local_network_range }}"
 
-# Database
+# Database - Gebruikt de specifieke 'homeassistant' user en het bijbehorende wachtwoord
 recorder:
-  db_url: postgresql://homeassistant:{{ vault_postgres_password }}@postgres_db/homeassistant
+  db_url: "postgresql://homeassistant:{{ vault_ha_db_password }}@postgres_db/homeassistant"
   purge_keep_days: 30
   commit_interval: 30
 
-# Omgevingssensoren
+# Omgevingssensoren (Luchtmeetnet Haarlem-Schalkwijk)
 sensor:
   - platform: rest
     name: "Luchtkwaliteit_Schalkwijk"
     resource: "https://api.luchtmeetnet.nl/open_api/stations/NL01488/measurements?formula=PM25"
     value_template: "{% raw %}{{ value_json.data[0].value }}{% endraw %}"
+    unit_of_measurement: "µg/m³"
+    scan_interval: 600
