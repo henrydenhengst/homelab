@@ -82,7 +82,7 @@
 {{ dozzle_subdomain }}.{{ duckdns_domain }}.{{ domain }} {
     import duckdns_auth
     import basic_auth
-    reverse_proxy {{ dozzle_container_name }}:{{ dozzle_port }}
+    reverse_proxy dozzle:{{ dozzle_port }}
 }
 
 # 11. Authentik SSO
