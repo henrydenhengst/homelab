@@ -8,6 +8,7 @@ group_vars/all/*.vault.yml
 *.vault_pass*
 .vault_pass*
 ansible.log
+*.iso
 
 # --- CONTAINER MAPPEN (worden lokaal gegenereerd) ---
 /caddy/

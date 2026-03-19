@@ -1,56 +1,23 @@
----
-- name: "Maak Debian 12 Bootable USB"
-  hosts: localhost
-  connection: local
-  become: false
-  vars:
-    # Debian 12 specifieke variabelen
-    debian_version: "12.9.0"
-    iso_name: "debian-{{ debian_version }}-amd64-netinst.iso"
-    iso_url: "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/{{ iso_name }}"
-    sums_url: "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/SHA256SUMS"
-    download_dir: "{{ ansible_env.HOME }}/Downloads"
-    
-    # DOELAPPARAAT: Pas dit aan naar jouw USB-stick (bijv. /dev/sdb)
-    # Gebruik 'lsblk' om de juiste schijf te vinden!
-    target_device: "/dev/sdX"
+#!/bin/bash
+set -e
 
-  tasks:
-    - name: "Check of het doelapparaat {{ target_device }} bestaat"
-      ansible.builtin.stat:
-        path: "{{ target_device }}"
-      register: device_stat
+TARGET_DISK="/dev/sdb"
+# De exacte link naar de laatste Debian 12 (Oldstable)
+ISO_URL="https://cdimage.debian.org/cdimage/archive/12.13.0/amd64/iso-cd/debian-12.13.0-amd64-netinst.iso"
 
-    - name: "Stop als het apparaat niet bestaat of geen block device is"
-      ansible.builtin.fail:
-        msg: "FOUT: {{ target_device }} is geen geldig apparaat!"
-      when: not device_stat.stat.exists or not device_stat.stat.isblk
+echo "1. Stick ontkoppelen en vrijgeven..."
+# Cinnamon/Gnome mounten sticks vaak automatisch; dit gooit ze eraf.
+sudo umount ${TARGET_DISK}* 2>/dev/null || true
 
-    - name: "Download Debian 12 ISO"
-      ansible.builtin.get_url:
-        url: "{{ iso_url }}"
-        dest: "{{ download_dir }}/{{ iso_name }}"
-        checksum: "sha256:{{ sums_url }}"
-        mode: '0644'
-      register: download_iso
+echo "2. ISO downloaden (Debian 12.13)..."
+wget -c "$ISO_URL" -O debian-12-netinst.iso
 
-    - name: "Bevestiging vragen voor wissen van {{ target_device }}"
-      ansible.builtin.pause:
-        prompt: "WAARSCHUWING: Alle data op {{ target_device }} wordt gewist! Typ 'JA' om door te gaan"
-      register: user_confirmation
+echo "3. Stick opschonen..."
+sudo wipefs -a "$TARGET_DISK"
+# Schrijf een beetje 'zeroes' om de partitietabel echt te mollen
+sudo dd if=/dev/zero of="$TARGET_DISK" bs=512 count=100 status=none
 
-    - name: "Breek af als bevestiging niet 'JA' is"
-      ansible.builtin.fail:
-        msg: "Actie geannuleerd door gebruiker."
-      when: user_confirmation.user_input != "JA"
+echo "4. ISO schrijven naar $TARGET_DISK..."
+sudo dd if=debian-12-netinst.iso of="$TARGET_DISK" bs=4M status=progress oflag=sync
 
-    - name: "Schrijf ISO naar USB-stick (dd)"
-      become: true
-      ansible.builtin.command:
-        cmd: "dd if={{ download_dir }}/{{ iso_name }} of={{ target_device }} bs=4M status=progress conv=fsync"
-      register: dd_result
-      changed_when: true
-
-    - name: "Resultaat"
-      ansible.builtin.debug:
-        msg: "✅ Debian 12 installatiestick op {{ target_device }} is gereed!"
+echo "Klaar! Je Debian 12.13 stick is klaar."

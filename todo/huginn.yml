@@ -1,0 +1,37 @@
+
+
+services:
+  huginn:
+    image: huginn/huginn-single-process
+    container_name: huginn
+    restart: always
+    depends_on:
+      - db
+    environment:
+      HUGINN_DATABASE_ADAPTER: postgresql
+      HUGINN_DATABASE_HOST: db
+      HUGINN_DATABASE_USERNAME: huginn
+      HUGINN_DATABASE_PASSWORD: huginnpassword
+      HUGINN_DATABASE_NAME: huginn_production
+      HUGINN_EMAIL_FROM_ADDRESS: huginn@example.com
+      HUGINN_EMAIL_REPLY_TO_ADDRESS: huginn@example.com
+      HUGINN_HOST: huginn.local
+    ports:
+      - "3000:3000"
+    volumes:
+      - huginn_data:/home/huginn/data
+
+  db:
+    image: postgres:15
+    container_name: huginn_db
+    restart: always
+    environment:
+      POSTGRES_USER: huginn
+      POSTGRES_PASSWORD: huginnpassword
+      POSTGRES_DB: huginn_production
+    volumes:
+      - huginn_db_data:/var/lib/postgresql/data
+
+volumes:
+  huginn_data:
+  huginn_db_data:

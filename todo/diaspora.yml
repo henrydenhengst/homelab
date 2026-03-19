@@ -1,0 +1,75 @@
+
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: diaspora_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: diaspora
+      POSTGRES_PASSWORD: diaspora_pass
+      POSTGRES_DB: diaspora_production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.8"
+          memory: "512M"
+
+  redis:
+    image: redis:7
+    container_name: diaspora_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "128M"
+
+  diaspora:
+    image: diaspora/diaspora:latest
+    container_name: diaspora_app
+    restart: unless-stopped
+    environment:
+      DOMAIN: "diaspora.local"
+      POD_NAME: "mini2010-pod"
+      DB_HOST: "postgres"
+      DB_USER: "diaspora"
+      DB_PASS: "diaspora_pass"
+      REDIS_HOST: "redis"
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8085:3000"   # Obscure port voor web interface
+    volumes:
+      - diaspora_data:/var/lib/diaspora/public/uploads
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1G"
+
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    container_name: ipfs_node
+    restart: unless-stopped
+    ports:
+      - "59112:5001"  # API
+      - "82736:8080"  # Gateway
+    volumes:
+      - ipfs_data:/data/ipfs
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1G"
+
+volumes:
+  postgres_data:
+  redis_data:
+  diaspora_data:
+  ipfs_data:

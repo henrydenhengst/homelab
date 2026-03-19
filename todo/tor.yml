@@ -1,0 +1,32 @@
+
+
+services:
+  tor_relay:
+    image: alpine/tor:latest
+    container_name: tor_relay
+    restart: unless-stopped
+    volumes:
+      - ./tor_relay_data:/var/lib/tor
+    ports:
+      - "19001:19001"   # ORPort (relay port)
+      - "19002:19002"   # DirPort (directory port)
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "150M"
+    environment:
+      # Optioneel: laat leeg of geef willekeurige naam bij runtime
+      TOR_NICKNAME: ""
+    command: >
+      sh -c "
+        if [ -n \"$TOR_NICKNAME\" ]; then
+          echo \"Nickname $TOR_NICKNAME\" >> /etc/tor/torrc
+        fi
+        echo 'ORPort 19001' >> /etc/tor/torrc &&
+        echo 'DirPort 19002' >> /etc/tor/torrc &&
+        echo 'ExitRelay 0' >> /etc/tor/torrc &&
+        echo 'SocksPort 0' >> /etc/tor/torrc &&
+        echo 'Log notice stdout' >> /etc/tor/torrc &&
+        tor -f /etc/tor/torrc
+      "

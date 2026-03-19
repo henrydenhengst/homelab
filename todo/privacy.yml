@@ -1,0 +1,37 @@
+
+
+services:
+  lokinet:
+    image: oxen-io/lokinet:latest
+    container_name: lokinet
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    volumes:
+      - lokinet_data:/var/lib/lokinet
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "150M"
+
+  i2p:
+    image: eyedeekay/i2p:latest
+    container_name: i2p
+    restart: unless-stopped
+    ports:
+      - "7654:7654"  # Web console
+      - "4444:4444"  # SAM bridge
+    volumes:
+      - i2p_data:/i2p
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "400M"
+
+volumes:
+  lokinet_data:
+  i2p_data:
