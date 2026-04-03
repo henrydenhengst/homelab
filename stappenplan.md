@@ -2,6 +2,10 @@
 
 ## 0. SSH & TOEGANGSBEHEER (Ansible Ready)
 
+```
+https://github.com/henrydenhengst/mydesktop/blob/main/mdns%2Fmdns.yml
+```
+
 ## 1. OPNsense Router (NIC 3 / Management)
 - **System -> Settings -> Administration:**
   - [x] Enable Secure Shell
