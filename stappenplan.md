@@ -1,6 +1,6 @@
 # MASTERPLAN: METERKAST MIGRATIE & SMART HOME DEPLOYMENT
 
-# SSH & TOEGANGSBEHEER (Ansible Ready)
+## 0. SSH & TOEGANGSBEHEER (Ansible Ready)
 
 ## 1. OPNsense Router (NIC 3 / Management)
 - **System -> Settings -> Administration:**
