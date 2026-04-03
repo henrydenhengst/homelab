@@ -1,5 +1,39 @@
 # MASTERPLAN: METERKAST MIGRATIE & SMART HOME DEPLOYMENT
 
+# SSH & TOEGANGSBEHEER (Ansible Ready)
+
+## 1. OPNsense Router (NIC 3 / Management)
+- **System -> Settings -> Administration:**
+  - [x] Enable Secure Shell
+  - [x] Root Login: Allow Password Login (Tijdelijk, voor de eerste Ansible push)
+  - [ ] Password Authentication: Disable (Zodra je SSH-key door Ansible is geplaatst)
+  - SSH Port: 22
+- **Firewall Rules (Interface NIC 3):**
+  - Pass | IPv4 | TCP | Source: Management Net | Port: 22 | Dest: NIC 3 Address
+
+## 2. Homelab Server (NIC 3 / Management)
+- **Installatie:** `sudo apt install openssh-server mosh -y`
+- **Configuratie (/etc/ssh/sshd_config):**
+  - `PermitRootLogin prohibit-password` (Alleen inloggen met keys)
+  - `PasswordAuthentication no` (Zodra je keys werken)
+- **UFW / Firewall:**
+  - `sudo ufw allow 22/tcp`
+  - `sudo ufw allow 60000:61000/udp` (Voor Mosh)
+
+## 3. Ansible Control Node (Je werkstation)
+- **SSH Key Gen:** `ssh-keygen -t ed25519 -C "ansible-admin"`
+- **Keys Verspreiden:**
+  - `ssh-copy-id -i ~/.ssh/id_ed25519.pub user@opnsense-ip`
+  - `ssh-copy-id -i ~/.ssh/id_ed25519.pub user@server-ip`
+- **Inventory File (`hosts.ini`):**
+  ```ini
+  [network]
+  router_opnsense ansible_host=192.168.x.1
+
+  [servers]
+  homelab_server ansible_host=192.168.x.10
+
+
 ## FASE 1: PRE-STAGING (Op de werkbank)
 1.  **OPNsense Installatie:**
     - NIC 1: WAN (Koppel nog niet aan ONT).
