@@ -1,82 +1,45 @@
-# MASTERPLAN: METERKAST MIGRATIE & SMART HOME DEPLOYMENT
+# MASTERPLAN: MIKROTIK CORE & SMART HOME DEPLOYMENT (2026)
 
-## 0. SSH & TOEGANGSBEHEER (Ansible Ready)
+## 0. DE DEVOPS TOOLKIT (Ansible Ready)
+1. **Beheerserver (Docker Host):** Draai je "Setup DevOps Toolkit" playbook op je server.
+   - Installeert: `ansible`, `mosh`, `avahi-daemon` (mDNS), `clusterssh`, `tmux`.
+   - Genereert SSH-keys voor communicatie met de MikroTik en Opals.
+2. **mDNS:** Zorg dat `server.local` bereikbaar is voor eenvoudige toegang.
 
-```
-https://github.com/henrydenhengst/mydesktop/blob/main/mdns%2Fmdns.yml
-```
-
-## 1. OPNsense Router (NIC 3 / Management)
-- **System -> Settings -> Administration:**
-  - [x] Enable Secure Shell
-  - [x] Root Login: Allow Password Login (Tijdelijk, voor de eerste Ansible push)
-  - [ ] Password Authentication: Disable (Zodra je SSH-key door Ansible is geplaatst)
-  - SSH Port: 22
-- **Firewall Rules (Interface NIC 3):**
-  - Pass | IPv4 | TCP | Source: Management Net | Port: 22 | Dest: NIC 3 Address
-
-## 2. Homelab Server (NIC 3 / Management)
-- **Installatie:** `sudo apt install openssh-server mosh -y`
-- **Configuratie (/etc/ssh/sshd_config):**
-  - `PermitRootLogin prohibit-password` (Alleen inloggen met keys)
-  - `PasswordAuthentication no` (Zodra je keys werken)
-- **UFW / Firewall:**
-  - `sudo ufw allow 22/tcp`
-  - `sudo ufw allow 60000:61000/udp` (Voor Mosh)
-
-## 3. Ansible Control Node (Je werkstation)
-- **SSH Key Gen:** `ssh-keygen -t ed25519 -C "ansible-admin"`
-- **Keys Verspreiden:**
-  - `ssh-copy-id -i ~/.ssh/id_ed25519.pub user@opnsense-ip`
-  - `ssh-copy-id -i ~/.ssh/id_ed25519.pub user@server-ip`
-- **Inventory File (`hosts.ini`):**
-  ```ini
-  [network]
-  router_opnsense ansible_host=192.168.x.1
-
-  [servers]
-  homelab_server ansible_host=192.168.x.10
-
-
-## FASE 1: PRE-STAGING (Op de werkbank)
-1.  **OPNsense Installatie:**
-    - NIC 1: WAN (Koppel nog niet aan ONT).
-    - NIC 2: LAN/Trunk naar Switch (VLAN 10, 20, 30).
-    - NIC 3: Management (Vaste IP-range voor SSH/Mosh/WebGUI).
-2.  **Kritieke Router Settings:**
-    - **NAT:** Zet Outbound NAT op 'Hybrid' of 'Automatic'.
-    - **DHCP:** Activeer DHCP-pools voor elk VLAN (10, 20, 30).
-    - **DNS:** Configureer Unbound DNS (luisteren op alle interfaces).
-    - **Firewall:** Voeg een tijdelijke 'Allow All' regel toe op alle LAN/VLAN interfaces om buitensluiting te voorkomen.
-    - **Mosh:** Open UDP poorten 60000-61000 in de firewall voor NIC 3.
-3.  **Switch Config (Netgear GS105E):**
-    - Poort 1: Trunk naar OPNsense NIC 2 (VLAN 10, 20, 30 tagged).
-    - Poort 2-5: Tagged naar kamers (VLAN 10, 20, 30).
-    - Management IP instellen in de range van NIC 3.
+## FASE 1: MIKROTIK BOOTSTRAP (Op de werkbank)
+1. **Basis Toegang:** - Verbind je laptop met Poort 2. Log in via `192.168.88.1` (WinBox of Web).
+   - Stel een sterk admin-wachtwoord in en activeer **SSH**.
+2. **Interface Config:**
+   - Poort 1: WAN (naar Glasvezel ONT).
+   - Poort 2-5: Bridge (Switch mode voor Server en Opals).
+3. **VLAN Definitie (Ansible Target):**
+   - VLAN 10: Trusted (Privé apparaten & Server MGMT).
+   - VLAN 20: IoT (Opals & ESP32's).
+   - VLAN 30: Guest.
+4. **Services:** Activeer DHCP-servers en DNS (met forwarding naar 1.1.1.1) voor elk VLAN.
 
 ## FASE 2: FYSIEKE INSTALLATIE (De Meterkast)
-1.  **Internet:** Glasvezel ONT -> OPNsense NIC 1 (Check VLAN 6 indien KPN/Odido).
-2.  **Core:** OPNsense NIC 2 -> Netgear Poort 1.
-3.  **Server:** Homelab Server -> OPNsense NIC 3 (Management).
-4.  **Kamers:** Bestaande wandkabels -> Netgear Poorten 2-5.
+1. **Internet:** Glasvezel ONT -> MikroTik Poort 1.
+2. **Server:** Homelab Server -> MikroTik Poort 2.
+3. **Kamers:** Wandkabels (naar Opals) -> MikroTik Poorten 3, 4 en 5.
+   *Tip: Gebruik Poort 5 voor de Opal die het verst weg staat (PoE-out ondersteuning).*
 
 ## FASE 3: SATELLIET DEPLOYMENT (De Kamers)
-1.  **Hardware:**
-    - Prik Opal Router in de wandcontactdoos.
-    - Verbind ESP32-C6 via 20cm USB A-naar-C kabel met de Opal.
-2.  **Provisioning:**
-    - Gebruik Ansible om OpenWrt op de Opals te configureren (VLAN aware).
-    - Flash ESP32-C6 via ESPHome Dashboard als 'Bluetooth Proxy' en 'Zigbee Router'.
-3.  **Zigbee Koppeling:**
-    - Prik Zwarte Dongle (Z-Stack) in de server via USB-verlengsnoer.
-    - Open Zigbee2MQTT -> Permit Join.
-    - Koppel de ESP32-C6's als routers om je mesh te bouwen.
+1. **Hardware:** Opal Router + ESP32-C6 (via 20cm USB-kabel).
+2. **Provisioning (via Ansible):**
+   - Push OpenWrt configs naar de Opals (VLAN 10/20/30 aware).
+   - Flash ESP32-C6's via het ESPHome dashboard op de server.
+3. **Mesh:** Voeg de ESP32's toe als Zigbee Routers aan je `zigbee2mqtt` stack.
 
-## FASE 4: DOCKER & SECURITY HARDENING
-1.  **Netwerk:** Definieer `macvlan` netwerken in Docker op basis van `eth3.20` (IoT).
-2.  **Isolatie:** - Verplaats `mosquitto` en `esphome` naar het IoT VLAN.
-    - Houd `vaultwarden` en `postgres_db` op de interne `db_internal` bridge.
-3.  **Firewall Lockdown:**
-    - Verwijder de 'Allow All' regels in OPNsense.
-    - Sluis alleen poort 1883 (MQTT) en 5053 (DNS) door van de kamers naar de server.
-    - Blokkeer al het overige verkeer tussen VLAN 20 (IoT) en VLAN 10 (Privé).
+## FASE 4: DOCKER & NETWORK HARDENING
+1. **Docker Netwerk:** Gebruik `macvlan` op de server gekoppeld aan de MikroTik VLAN 20 interface.
+2. **Firewall Lockdown (MikroTik Filter Rules):**
+   - **Isolatie:** Blokkeer verkeer van VLAN 20 (IoT) naar VLAN 10 (Privé).
+   - **Pinholes:** Sta alleen MQTT (1883) toe van de Opals naar de server.
+   - **Killswitch:** Zorg dat IoT-apparaten niet rechtstreeks naar internet kunnen (optioneel).
+
+## FASE 5: ANSIBLE AUTOMATION
+- Gebruik de `community.network.routeros` collectie voor:
+  - Backups van je router-config.
+  - Snel toevoegen van nieuwe VLAN's of Firewall regels.
+  - Port-forwarding voor je Caddy/Home Assistant toegang.
