@@ -4,7 +4,7 @@
 Je gaat een eenvoudige maar krachtige automatisering bouwen: een lamp die aangaat bij beweging. Dit is de "Hallo Wereld" van het smart home en laat meteen zien hoe krachtig Home Assistant is.
 
 ## Stap 1: Open de automatisering editor
-- Open Home Assistant (https://homeassistant.denhengst.duckdns.org)
+- Open Home Assistant (https://yyy.zzz.duckdns.org)
 - Klik links in het menu op **Instellingen** (tandwiel icoon)
 - Klik op **Automatiseringen & Scènes**
 - Klik rechtsonder op de blauwe knop **➕ AUTOMATISERING TOEVOEGEN**
