@@ -135,4 +135,4 @@ Spraakbediening:
 
 ## Je bent nu een Home Assistant bouwer!
 
-Vanaf hier kun je alle kanten op. De community is enorm, en met jouw infra-achtergrond kun je echt mooie dingen bouwen. Heb je vragen of wil je een specifieke automatisering maken? Vraag het gerust!
+Vanaf hier kun je alle kanten op. De community is enorm, en met jouw infra-achtergrond kun je echt mooie dingen bouwen.
